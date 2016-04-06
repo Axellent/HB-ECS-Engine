@@ -144,6 +144,21 @@ namespace GameEngine
         }
 
         /// <summary>
+        /// Returns the first component of the given type
+        /// </summary>
+        /// <typeparam name="T"> The type of the component </typeparam>
+        /// <returns>A list with entities, else null </returns>
+        public Entity GetFirstComponentOfType<T>() where T : IComponent
+        {
+            Type type = typeof(T);
+
+            if (componentsDictionary.ContainsKey(type))
+                return componentsDictionary[type].Keys.First();
+
+            return null;
+        }
+
+        /// <summary>
         /// Removes an entity
         /// </summary>
         /// <param name="entity"> The entity to be removed </param>

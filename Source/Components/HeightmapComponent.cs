@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ECS_Engine.Source.Components
+namespace GameEngine
 {
-    class HeightmapComponent
+    class HeightmapComponent : IComponent
     {
         List<VertexPositionColor> vertices;
         Vector3[][] heightMap; 

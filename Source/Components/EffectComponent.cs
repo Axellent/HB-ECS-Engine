@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ECS_Engine.Source.Components
+namespace GameEngine
 {
     class EffectComponent : IComponent
     {
