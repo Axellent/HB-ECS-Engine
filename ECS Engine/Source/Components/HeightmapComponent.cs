@@ -6,12 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ECS_Engine.Source.Components
+namespace GameEngine
 {
-    class HeightmapComponent
+    class HeightmapComponent : IComponent
     {
         List<VertexPositionColor> vertices;
-        Vector2[][] heightMap; 
+        Vector3[][] heightMap; 
         public List<short> vertexBuffer { get; set; }
 
     }
