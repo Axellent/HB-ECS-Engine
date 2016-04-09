@@ -15,22 +15,25 @@ namespace GameEngine
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
-            List<Entity> entities = ComponentManager.Instance.GetAllEntitiesWithComponentType<TimerComponent>();
+            List<Entity> sceneEntities = SceneManager.Instance.GetActiveScene().GetAllEntities();
 
-            if (entities == null)
+            if (sceneEntities == null)
             {
-                ErrorLogger.Instance.LogErrorToDisk("TimerSystem - no entities with TimerComponent", "TimerSystemLog.Txt");
+                //ErrorLogger.Instance.LogErrorToDisk("TimerSystem - no entities with TimerComponent", "TimerSystemLog.Txt");
                 return;
             }
-
-            foreach (Entity e in entities)
+            foreach (Entity e in sceneEntities)
             {
-                if (e.Updateable)
+                TimerComponent t = ComponentManager.Instance.GetEntityComponent<TimerComponent>(e);
+                if (t != null)
                 {
-                    TimerComponent timer = ComponentManager.Instance.GetEntityComponent<TimerComponent>(e);
-                    timer.CurrentTime += gameTime.ElapsedGameTime.TotalSeconds;
-                    if (timer.CurrentTime > timer.TargetTime)
-                        timer.TimerDone = true;
+                    if (e.Updateable)
+                    {
+                        TimerComponent timer = ComponentManager.Instance.GetEntityComponent<TimerComponent>(e);
+                        timer.CurrentTime += gameTime.ElapsedGameTime.TotalSeconds;
+                        if (timer.CurrentTime > timer.TargetTime)
+                            timer.TimerDone = true;
+                    }
                 }
             }
         }

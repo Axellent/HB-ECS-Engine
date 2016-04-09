@@ -23,7 +23,6 @@ namespace GameEngine
             {
                 UpdateStates(gamePadComp);
                 UpdateActionStates(gamePadComp);
-                gamePadComp.Script.Update(gameTime, ComponentManager.Instance.GetEntityOfComponent<GamePadComponent>(gamePadComp), gamePadComp.ActionStates);
             }
         }
 

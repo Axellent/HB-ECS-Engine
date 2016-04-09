@@ -11,35 +11,31 @@ namespace GameEngine
     {
         public void Update(GameTime gameTime)
         {
-            List<Entity> entities = ComponentManager.Instance.GetAllEntitiesWithComponentType<AnimationComponent>();
+            List<Entity> entities = SceneManager.Instance.GetActiveScene().GetAllEntities();
 
             foreach (Entity enitity in entities)
             {
                 AnimationComponent anim = ComponentManager.Instance.GetEntityComponent<AnimationComponent>(enitity);
+                if (anim == null)
+                    continue;
+
+                if (anim.CurrentAnimation == null)
+                    continue;
+
                 anim.CurrentElapsedTime += gameTime.ElapsedGameTime.TotalSeconds;
 
-                if (anim.CurrentElapsedTime >= anim.TimePerFrame)
+                if (anim.CurrentElapsedTime > anim.TimePerFrame)
                 {
-                    anim.CurrentElapsedTime -= anim.TimePerFrame;
-
-                    if (anim.CurrentXFrame >= anim.maxXFrames - 1)
+                    anim.CurrentElapsedTime = 0;
+                    anim.CurrentFrame++;
+                    int t = anim.GetAnimLength();
+                    if (anim.CurrentFrame >= anim.GetAnimLength())
                     {
-                        anim.CurrentXFrame = 0;
-                        anim.CurrentYFrame++;
+                        anim.CurrentFrame = 0;
                     }
-                    else
-                    {
-                        anim.CurrentXFrame++;
-                    }
-
-                    if (anim.CurrentXFrame > anim.GetCurrentAnimation().EndX || anim.CurrentYFrame > anim.GetCurrentAnimation().EndY)
-                    {
-                        anim.CurrentXFrame = anim.GetCurrentAnimation().StartX;
-                        anim.CurrentYFrame = anim.GetCurrentAnimation().StartY;
-                    }
+                    anim.SetSourceRect(anim.GetCurrentFrame());
                 }
             }
         }
-
     }
 }

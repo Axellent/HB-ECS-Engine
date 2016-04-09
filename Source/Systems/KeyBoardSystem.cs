@@ -22,7 +22,6 @@ namespace GameEngine
             {
                 UpdateState(keyboardComp);
                 UpdateActionStates(keyboardComp);
-                keyboardComp.Script.Update(gameTime, ComponentManager.Instance.GetEntityOfComponent<KeyBoardComponent>(keyboardComp), keyboardComp.ActionStates);
             }
         }
 
@@ -39,7 +38,7 @@ namespace GameEngine
                 foreach (Keys key in keyboardComp.Actions[action])
                 {
                     bool newState = keyboardComp.NewState.IsKeyDown(key);
-                    bool oldState = keyboardComp.NewState.IsKeyDown(key);
+                    bool oldState = keyboardComp.OldState.IsKeyDown(key);
 
                     if (newState && !oldState)
                     {

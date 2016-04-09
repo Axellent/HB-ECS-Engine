@@ -24,12 +24,11 @@ namespace GameEngine
         public List<Entity> GetAllEntities()
         {
             List<Entity> e = new List<Entity>();
-            List<Entity> tmp = new List<Entity>();
-            for (int i = 0; i < layers.Count; ++i)
+            List<Entity> tmp;
+            foreach(int key in layers.Keys)
             {
-                tmp = layers[i].ToList();
+                tmp = layers[key].ToList();
                 e = e.Concat(tmp).ToList();
-                //tmp.Clear();
             }
             return e;
         }
@@ -50,7 +49,7 @@ namespace GameEngine
         /// <param name="entity"> The entity to be added to layer </param>
         public void AddEntityToLayer(int layer, Entity entity)
         {
-            if (layers.Count<=layer)
+            if (!layers.ContainsKey(layer))
             {
                 layers.Add(layer, new List<Entity>());
             }
@@ -64,9 +63,11 @@ namespace GameEngine
         /// <param name="?"> The entity to be removed </param>
         public void RemoveEntityFromLayer(int layer, Entity entity)
         {
-            if (layers[layer] != null)
+            if (layers.ContainsKey(layer))
+            {
                 if (layers[layer].Contains(entity))
                     layers[layer].Remove(entity);
+            }
         }
 
         /// <summary>
@@ -75,8 +76,10 @@ namespace GameEngine
         /// <param name="layer"> The layer to be removed </param>
         public void RemoveLayer(int layer)
         {
-            if (layers[layer] != null)
+            if (layers.ContainsKey(layer))
+            {
                 layers.Remove(layer);
+            }
         }
     }
 }

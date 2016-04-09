@@ -7,10 +7,9 @@ namespace GameEngine
 {
     public class SceneManager
     {
-        private string activeScene = "";
-        private bool fullscreen = false;
+        private string activeScene = "";        
 
-        public Dictionary<string, Scene> sceneDictionary = new Dictionary<string,Scene>();
+        public Dictionary<string, Scene> sceneDictionary = new Dictionary<string, Scene>();
 
         private static SceneManager instance;
         public static SceneManager Instance
@@ -106,15 +105,6 @@ namespace GameEngine
             if(!string.IsNullOrEmpty(activeScene))
                 return sceneDictionary[activeScene];
             return null;
-        }
-
-        /// <summary>
-        /// Sets the 
-        /// </summary>
-        /// <param name="fullscreen"></param>
-        public void SetFullscreen(bool fullscreen)
-        {
-            this.fullscreen = fullscreen;
         }
     }
 }

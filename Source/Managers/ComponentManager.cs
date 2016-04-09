@@ -6,7 +6,7 @@ using System.Text;
 namespace GameEngine
 {
     /// <summary>
-    /// public class to handle components: Add, remove and  retrive components 
+    /// Class to handle components: Add, remove and  retrive components 
     /// </summary>
     public class ComponentManager
     {
@@ -71,6 +71,32 @@ namespace GameEngine
             return null;
         }
 
+        /// <summary>
+        /// This method returns an Entity with the given tagname from the given list of entities
+        /// </summary>
+        /// <param name="tagName"></param>
+        /// <returns>The Entity with the given tag - if it exist</returns>
+        /// <returns>null - if no entity with the tagName was found</returns>
+        public Entity GetEntityWithTag(string tagName,List<Entity> entities)
+        {
+            Type type = typeof(TagComponent);
+            if (componentsDictionary.ContainsKey(type))
+            {
+                foreach(Entity e in entities)
+                {
+                    TagComponent t = GetEntityComponent<TagComponent>(e);
+                    if (t != null)
+                    {
+                        if (t.tagName.Equals(tagName))
+                        {
+                            return e;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
         public Entity GetEntityOfComponent<T>(IComponent component) where T : IComponent
         {
             Type type = typeof(T);
@@ -90,6 +116,20 @@ namespace GameEngine
             return null;
         }
 
+        /// <summary>
+        /// Returns the first component of the given type
+        /// </summary>
+        /// <typeparam name="T"> The type of the component </typeparam>
+        /// <returns>A list with entities, else null </returns>
+        public Entity GetFirstComponentOfType<T>() where T : IComponent
+        {
+            Type type = typeof(T);
+
+            if (componentsDictionary.ContainsKey(type))
+                return componentsDictionary[type].Keys.First();
+
+            return null;
+        }
         /// <summary>
         /// This method returns a List of components that belonged to any of the entities
         /// that was passed in through the list.
@@ -139,21 +179,6 @@ namespace GameEngine
 
             if (componentsDictionary.ContainsKey(type))
                 return componentsDictionary[type].Keys.ToList();
-
-            return null;
-        }
-
-        /// <summary>
-        /// Returns the first component of the given type
-        /// </summary>
-        /// <typeparam name="T"> The type of the component </typeparam>
-        /// <returns>A list with entities, else null </returns>
-        public Entity GetFirstComponentOfType<T>() where T : IComponent
-        {
-            Type type = typeof(T);
-
-            if (componentsDictionary.ContainsKey(type))
-                return componentsDictionary[type].Keys.First();
 
             return null;
         }

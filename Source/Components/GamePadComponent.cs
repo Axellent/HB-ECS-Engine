@@ -12,25 +12,23 @@ namespace GameEngine
 {
     public class GamePadComponent :IComponent
     {
+        
+
         public PlayerIndex PlayerIndex { get; set; }
         public Dictionary<string, List<Buttons>> Actions{ get; set; }
         public Dictionary<string, BUTTON_STATE> ActionStates { get; set; }
         public GamePadState NewState { get; set; }
         public GamePadState OldState { get; set; }
-        public IInputScript Script { get; set; }
 
-        public GamePadComponent()
+        public GamePadComponent() : this(PlayerIndex.One)
         {
-            PlayerIndex = PlayerIndex.One;
-            Script = null;
         }
 
-        public GamePadComponent(PlayerIndex playerIndex, IInputScript script)
+        public GamePadComponent(PlayerIndex playerIndex)
         {
             ActionStates = new Dictionary<string, BUTTON_STATE>();
             Actions = new Dictionary<string, List<Buttons>>();
             PlayerIndex = playerIndex;
-            Script = script;
         }
 
 
@@ -52,6 +50,45 @@ namespace GameEngine
                 Actions[action].Remove(button);
             }
         }
+
+        public BUTTON_STATE? GetActionState(string action)
+        {
+            if (ActionStates.ContainsKey(action))
+            {
+                return ActionStates[action];
+            }
+            return null;
+        }
+        
+        public void SetAction(string action, BUTTON_STATE state)
+        {
+            ActionStates[action] = state;
+        }
+
+        public Vector2 GetLeftThumbStick(bool leftThumb, float deadZone)
+        {
+            Vector2 vec2;
+            if (leftThumb)
+            {
+                vec2 = NewState.ThumbSticks.Left;
+            }
+            else
+            {
+                vec2 = NewState.ThumbSticks.Right;
+            }
+
+            if (vec2.X < deadZone)
+            {
+                vec2.X = 0;
+            }
+            if (vec2.Y < deadZone)
+            {
+                vec2.Y = 0;
+            }
+
+            return vec2;
+        }
+
 
     }
 }

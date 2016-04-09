@@ -53,7 +53,7 @@ namespace GameEngine
                 }
                 updateSystemDictionary[category][system.GetType()] = (IUpdateSystem)system;
             }
-            else if (system is IRenderSystem)
+            if (system is IRenderSystem)
             {
                 if (!renderSystemDictionary.ContainsKey(category))
                 {
@@ -91,10 +91,30 @@ namespace GameEngine
                     }
                 }
             }
-
-
         }
 
+        /// <summary>
+        /// This method deregisters a whole category
+        /// </summary>
+        /// <param name="category"></param>
+        /// <param name="system"></param>
+        public void DeregisterCategory(string category,Type system)
+        {
+            if (system is IUpdateSystem)
+            {
+                if (updateSystemDictionary.ContainsKey(category))
+                {
+                    updateSystemDictionary.Remove(category);
+                }
+            }
+            else if (system is IRenderSystem)
+            {
+                if (renderSystemDictionary.ContainsKey(category))
+                {
+                    renderSystemDictionary.Remove(category);
+                }
+            }
+        }
 
         /// <summary>
         /// 
@@ -103,11 +123,14 @@ namespace GameEngine
         /// <param name="gameTime"></param>
         public void RunAllRenderSystems(SpriteBatch spriteBatch, GameTime gameTime)
         {
-            if (renderSystemDictionary.ContainsKey(Category))
+            if (renderSystemDictionary.Count > 0)
             {
-                foreach (IRenderSystem renSys in renderSystemDictionary[Category].Values)
+                if (renderSystemDictionary.ContainsKey(Category))
                 {
-                    renSys.Render(spriteBatch, gameTime);
+                    foreach (IRenderSystem renSys in renderSystemDictionary[Category].Values)
+                    {
+                        renSys.Render(spriteBatch, gameTime);
+                    }
                 }
             }
         }
@@ -118,11 +141,14 @@ namespace GameEngine
         /// <param name="gameTime"></param>
         public void RunAllUpdateSystems(GameTime gameTime)
         {
-            if (updateSystemDictionary.ContainsKey(Category))
+            if (updateSystemDictionary.Count > 0)
             {
-                foreach (IUpdateSystem upSys in updateSystemDictionary[Category].Values)
+                if (updateSystemDictionary.ContainsKey(Category))
                 {
-                    upSys.Update(gameTime);
+                    foreach (IUpdateSystem upSys in updateSystemDictionary[Category].Values)
+                    {
+                        upSys.Update(gameTime);
+                    }
                 }
             }
         }

@@ -75,7 +75,7 @@ namespace GameEngine
         }
 
         /// <summary>
-        /// This meth
+        /// This method removes a song from the song pool
         /// </summary>
         /// <param name="songName"></param>
         public void RemoveSong(string songName)
@@ -277,7 +277,23 @@ namespace GameEngine
         }
 
         /// <summary>
-        /// A inner public class holding soundCategories, with a list of sounds belonging to it
+        /// Get the volume of a specified sound category
+        /// </summary>
+        /// <param name="category"></param>
+        /// <returns></returns>
+        public float GetCategorySoundVolume(string category)
+        {
+            if(!soundCategories.ContainsKey(category))
+            {
+                ErrorLogger.Instance.LogErrorToDisk("Error: The sound category:" + category + " does not exist, can't get volume for a category that doesn't exist\n", "SoundManagerLog.txt");
+                return 0.0f;
+            }
+
+            return soundCategories[category].getSoundVolume();            
+        }
+
+        /// <summary>
+        /// A inner class holding soundCategories, with a list of sounds belonging to it
         /// </summary>
         private class SoundCategory
         {

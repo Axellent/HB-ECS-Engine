@@ -9,25 +9,18 @@ using Microsoft.Xna.Framework;
 
 namespace GameEngine
 {
-    class ModelComponent : IComponent
+    public class ModelComponent : IComponent
     {
         public Model model {get;set;}
-        public Matrix scale { get; set; }
-        public Matrix position { get; set; }
-        public Quaternion rotation { get; set; }
 
-        void SetModel(Model model)
+        public bool useBasicEffect { get; set; }
+        Dictionary<int, Vector3> MeshTransforms { get; set; }
+
+        public ModelComponent(Model model, bool useBasicEffect)
         {
             this.model = model;
-        }
-        /// <summary>
-        /// This function rotates the given bone by the given matrix
-        /// </summary>
-        /// <param name="boneIndex"></param>
-        /// <param name="t"></param>
-        public void ChangeBoneTransform(int boneIndex, Matrix t)
-        {
-            model.Bones[boneIndex].Transform = t * model.Bones[boneIndex].Transform;
-        }
+            this.useBasicEffect = useBasicEffect;
+            MeshTransforms = new Dictionary<int, Vector3>();
+        }        
     }
 }

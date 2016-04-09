@@ -16,12 +16,13 @@ namespace GameEngine
         {
             List<Entity> entities = SceneManager.Instance.GetActiveScene().GetAllEntities();
             List<MouseComponent> MouseComps = ComponentManager.Instance.GetComponentsFromEntities<MouseComponent>(entities);
-
-            for (int i = 0; i < MouseComps.Count; ++i)
+            if (MouseComps.Count > 0)
             {
-                UpdateState(MouseComps[i]);
-                updateActionStates(MouseComps[i]);
-                MouseComps[i].Script.Update(gameTime, ComponentManager.Instance.GetEntityOfComponent<MouseComponent>(MouseComps[i]), MouseComps[i].actionStates);
+                for (int i = 0; i < MouseComps.Count; ++i)
+                {
+                    UpdateState(MouseComps[i]);
+                    updateActionStates(MouseComps[i]);
+                }
             }
         }
 

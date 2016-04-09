@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 
 namespace GameEngine
 {
-    public class PhysicsManager
+    class PhysicsManager
     {
         private PhysicsManager() { }
         private static PhysicsManager instance = null;

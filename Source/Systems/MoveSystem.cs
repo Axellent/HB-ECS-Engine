@@ -15,36 +15,41 @@ namespace GameEngine
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
-            List<List<Entity>> sceneEntities = SceneManager.Instance.GetActiveScene().GetAllLayers();
-            if (sceneEntities == null)
+            try
             {
-                //ErrorLogger.Instance.LogErrorToDisk("MoveSystem - no entities in scene to update", "MoveSystemLog.Txt");
-                return;
-            }
+                List<List<Entity>> sceneEntities = SceneManager.Instance.GetActiveScene().GetAllLayers();
 
-            for (int i = 0; i < sceneEntities.Count; ++i)
-            {
-                foreach(Entity e in sceneEntities[i])
+                for (int i = 0; i < sceneEntities.Count; ++i)
                 {
-                    if (e.Updateable)
+                    foreach (Entity e in sceneEntities[i])
                     {
-                        Velocity2DComponent v = ComponentManager.Instance.GetEntityComponent<Velocity2DComponent>(e);
-                        Position2DComponent p = ComponentManager.Instance.GetEntityComponent<Position2DComponent>(e);
-                        RectangleCollisionComponent r = ComponentManager.Instance.GetEntityComponent<RectangleCollisionComponent>(e);
-                        if (r != null)
+                        if (e.Updateable)
                         {
-                            int w = r.CollisionRect.Width;
-                            int h = r.CollisionRect.Height;
-                            r.CollisionRect = new Rectangle((int)p.Position.X, (int)p.Position.Y, w, h);
-                        }
+                            Velocity2DComponent v = ComponentManager.Instance.GetEntityComponent<Velocity2DComponent>(e);
+                            Position2DComponent p = ComponentManager.Instance.GetEntityComponent<Position2DComponent>(e);
+                            //TODO : Readd Collision Maybe ?
+                            //RectangleCollisionComponent r = ComponentManager.Instance.GetEntityComponent<RectangleCollisionComponent>(e);
+                            /*if (r != null)
+                            {
+                                int w = r.CollisionRect.Width;
+                                int h = r.CollisionRect.Height;
+                                r.CollisionRect = new Rectangle((int)p.Position.X, (int)p.Position.Y, w, h);
+                            }*/
 
-                        if (p != null && v != null)
-                        {
-                            p.Position += v.Velocity * v.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                            if (p != null && v != null)
+                            {
+                                p.Position += v.Velocity * v.Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                            }
                         }
                     }
                 }
+
+            }
+            catch (Exception ex)
+            {
+
             }
         }
+
     }
 }

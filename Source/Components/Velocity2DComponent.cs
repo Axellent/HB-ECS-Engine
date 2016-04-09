@@ -10,6 +10,7 @@ namespace GameEngine
     {
         public Vector2 Velocity { get; set; }
         public float Speed { get; set; }
+        public int direction { get; set; }
 
         public Velocity2DComponent(Vector2 vel, float speed)
         {

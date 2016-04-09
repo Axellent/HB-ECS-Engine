@@ -7,7 +7,7 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{86707912-7E3B-4288-B4A8-243F3D0F9E1A}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ECS_Engine</RootNamespace>
     <AssemblyName>ECS Engine</AssemblyName>
@@ -37,15 +37,17 @@
   <PropertyGroup>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="ECSEngine.cs" />
-    <Compile Include="Game1.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Source\Components\AIComponent.cs" />
     <Compile Include="Source\Components\AnimationComponent.cs" />
     <Compile Include="Source\Components\CameraComponent.cs" />
     <Compile Include="Source\Components\CircleCollisionComponent.cs" />
+    <Compile Include="Source\Components\CollisionComponent.cs" />
     <Compile Include="Source\Components\EffectComponent.cs" />
     <Compile Include="Source\Components\GamePadComponent.cs" />
     <Compile Include="Source\Components\HeightmapComponent.cs" />
@@ -64,13 +66,18 @@
     <Compile Include="Source\Components\TransformComponent.cs" />
     <Compile Include="Source\Components\TriggerComponent.cs" />
     <Compile Include="Source\Components\Velocity2DComponent.cs" />
+    <Compile Include="Source\Engine\CollisionArea.cs" />
+    <Compile Include="Source\Engine\CollisionRectangle.cs" />
     <Compile Include="Source\Engine\Entity.cs" />
     <Compile Include="Source\Engine\EntityFactory.cs" />
     <Compile Include="Source\Engine\ErrorLogger.cs" />
     <Compile Include="Source\Engine\InputDefines.cs" />
     <Compile Include="Source\Engine\ModelFactory.cs" />
+    <Compile Include="Source\Engine\Music.cs" />
     <Compile Include="Source\Engine\Scene.cs" />
+    <Compile Include="Source\InputDefines.cs" />
     <Compile Include="Source\Managers\ComponentManager.cs" />
+    <Compile Include="Source\Managers\InputManager.cs" />
     <Compile Include="Source\Managers\PhysicsManager.cs" />
     <Compile Include="Source\Managers\SceneManager.cs" />
     <Compile Include="Source\Managers\SoundManager.cs" />
@@ -80,17 +87,22 @@
     <Compile Include="Source\Systems\AbstractCollisionSystem.cs" />
     <Compile Include="Source\Systems\AISystem.cs" />
     <Compile Include="Source\Systems\AnimateSystem.cs" />
+    <Compile Include="Source\Systems\CameraSystem.cs" />
+    <Compile Include="Source\Systems\CollisionSystem.cs" />
     <Compile Include="Source\Systems\GamePadSystem.cs" />
+    <Compile Include="Source\Systems\InputSystem.cs" />
     <Compile Include="Source\Systems\IRenderSystem.cs" />
     <Compile Include="Source\Systems\ISystem.cs" />
     <Compile Include="Source\Systems\IUpdateSystem.cs" />
     <Compile Include="Source\Systems\KeyBoardSystem.cs" />
+    <Compile Include="Source\Systems\ModelRenderSystem.cs" />
     <Compile Include="Source\Systems\MouseSystem.cs" />
     <Compile Include="Source\Systems\MoveSystem.cs" />
     <Compile Include="Source\Systems\ParentSystem.cs" />
     <Compile Include="Source\Systems\SpriteRenderSystem.cs" />
     <Compile Include="Source\Systems\TextRenderSystem.cs" />
     <Compile Include="Source\Systems\TimerSystem.cs" />
+    <Compile Include="Source\Systems\TransformSystem.cs" />
     <Compile Include="Source\Systems\TriggerSystem.cs" />
   </ItemGroup>
   <ItemGroup>

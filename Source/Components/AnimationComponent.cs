@@ -9,16 +9,10 @@ namespace GameEngine
 {
     public class AnimationComponent : IComponent
     {
-        public struct Frame
-        {
-            public int StartX { set; get; }
-            public int StartY { set; get; }
-            public int EndX { set; get; }
-            public int EndY { set; get; }
-        }
 
         public double TimePerFrame { set; get; }
         public double CurrentElapsedTime { set; get; }
+        public bool visible {get;set;}
 
         private string currentAnimation;
         public string CurrentAnimation 
@@ -29,67 +23,106 @@ namespace GameEngine
             }
             set
             {
-                currentAnimation = value;
-                CurrentXFrame = animations[value].StartX;
-                CurrentYFrame = animations[value].StartY;
+                if (animations.ContainsKey(value))
+                {
+                    currentAnimation = value;
+                    CurrentFrame = 0;
+                    visible = true;
+                }
             }
         }
         
-        private Dictionary<string, Frame> animations = new Dictionary<string, Frame>();
+        private Dictionary<string, List<int>> animations = new Dictionary<string, List<int>>();
 
-        public int CurrentXFrame { get; set; }
-        public int CurrentYFrame { get; set; }
+        public int CurrentFrame { get; set; }
 
-        public int maxXFrames;
-        public int maxYFrames;
+        public int MaxXFrames;
+        public int MaxYFrames;
 
-        private Rectangle sourceRect = new Rectangle();
+        public Rectangle SourceRect = new Rectangle();
 
         public AnimationComponent(double timePerFrame, int animeationRectWidth, int animeationRectHeight, int textureWidth, int textureHeight)
         {
             TimePerFrame = timePerFrame;
-            sourceRect.Width = animeationRectWidth;
-            sourceRect.Height = animeationRectHeight;
-            maxXFrames = textureWidth / animeationRectWidth;
-            maxYFrames = textureHeight / animeationRectHeight;
+            SourceRect.Width = animeationRectWidth;
+            SourceRect.Height = animeationRectHeight;
+            MaxXFrames = textureWidth / animeationRectWidth;
+            MaxYFrames = textureHeight / animeationRectHeight;
         }
 
-        public void AddAnimation(string name, int startX, int startY, int endX, int endY)
+        public void AddFrameToAnimation(string name, int frame)
         {
-            Frame frame = new Frame();
-            frame.StartX = startX;
-            frame.StartY = startY;
-            frame.EndX = endX;
-            frame.EndY = endY;
-            animations[name] = frame;
+            if (!animations.ContainsKey(name))
+            {
+                animations[name] = new List<int>();
+            }
+            animations[name].Add(frame);
+        }
+
+        public void AddFramesToAnimation(string name, int[] frames)
+        {
+            if (!animations.ContainsKey(name))
+            {
+                animations[name] = new List<int>();
+            }
+            for (int i = 0; i < frames.Length; ++i)
+            {
+                animations[name].Add(frames[i]);
+            }
         }
 
         public void RemoveAnimation(string name)
         {
             if(animations.ContainsKey(name))
             {
-                animations.Remove(name);
+                animations[name].Clear();
             }
         }
 
-        public Frame GetCurrentAnimation()
+        public int GetCurrentFrame()
         {
-            return animations[CurrentAnimation];
+            if (animations.ContainsKey(currentAnimation))
+            {
+                if (CurrentFrame <= animations[currentAnimation].Count())
+                {
+                    return animations[currentAnimation][CurrentFrame];
+                }
+            }
+            return 0;
         }
 
-        public Rectangle GetSourceRect()
+        public void SetSourceRect(int frame)
         {
-            return new Rectangle(CurrentXFrame * sourceRect.Width, CurrentYFrame * sourceRect.Height, sourceRect.Width, sourceRect.Height);
+            int Y = frame / MaxXFrames;
+            int X = frame - (Y * MaxXFrames);
+            SourceRect.X = X * SourceRect.Width;
+            SourceRect.Y = Y * SourceRect.Height;
         }
 
-        public int GetSourceWidth()
+        public int GetAnimLength()
         {
-            return sourceRect.Width;
+            if (animations.ContainsKey(currentAnimation))
+                return animations[CurrentAnimation].Count;
+            else return 0;
         }
 
-        public int GetSournceHeight()
+        public Rectangle GetAnimationRectangle()
         {
-            return sourceRect.Height;
+            return SourceRect;
+        }
+
+        public void SetAnimation(string animation)
+        {
+            if (animations.ContainsKey(animation))
+            {
+                if (currentAnimation != animation)
+                {
+                    currentAnimation = animation;
+                    CurrentFrame = 0;
+                    CurrentElapsedTime = 0;
+                    SetSourceRect(GetCurrentFrame());
+                }
+            }
         }
 
     }

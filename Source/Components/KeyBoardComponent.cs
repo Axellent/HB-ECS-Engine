@@ -16,17 +16,11 @@ namespace GameEngine
         public Dictionary<string, BUTTON_STATE> ActionStates { get; set; }
         public KeyboardState NewState { get; set; }
         public KeyboardState OldState { get; set; }
-        public IInputScript Script { get; set; }
 
         public KeyBoardComponent()
         {
             Actions = new Dictionary<string, List<Keys>>();
             ActionStates = new Dictionary<string, BUTTON_STATE>();
-        }
-
-        public KeyBoardComponent(IInputScript script) : this()
-        {
-            Script = script;
         }
 
         public void AddKeyToAction(string action, Keys key)
@@ -46,5 +40,20 @@ namespace GameEngine
                 Actions[action].Remove(key);
             }
         }
+
+        public BUTTON_STATE? GetActionState(string action)
+        {
+            if(ActionStates.ContainsKey(action))
+            {
+                return ActionStates[action];
+            }
+            return null;
+        }
+
+        public void SetAction(string action, BUTTON_STATE state)
+        {
+            ActionStates[action] = state;
+        }
+
     }
 }
