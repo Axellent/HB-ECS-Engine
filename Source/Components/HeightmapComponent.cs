@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace GameEngine
 {
-    class HeightmapComponent : IComponent
+    public class HeightmapComponent : IComponent
     {
         List<VertexPositionColor> vertices;
-        Vector3[][] heightMap; 
+        float[,] heightData;
         public List<short> vertexBuffer { get; set; }
 
     }

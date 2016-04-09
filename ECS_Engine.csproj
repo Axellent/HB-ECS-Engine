@@ -90,6 +90,7 @@
     <Compile Include="Source\Systems\CameraSystem.cs" />
     <Compile Include="Source\Systems\CollisionSystem.cs" />
     <Compile Include="Source\Systems\GamePadSystem.cs" />
+    <Compile Include="Source\Systems\HeightMapSystem.cs" />
     <Compile Include="Source\Systems\InputSystem.cs" />
     <Compile Include="Source\Systems\IRenderSystem.cs" />
     <Compile Include="Source\Systems\ISystem.cs" />
