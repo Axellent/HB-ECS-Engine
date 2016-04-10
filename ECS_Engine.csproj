@@ -75,7 +75,6 @@
     <Compile Include="Source\Engine\ModelFactory.cs" />
     <Compile Include="Source\Engine\Music.cs" />
     <Compile Include="Source\Engine\Scene.cs" />
-    <Compile Include="Source\InputDefines.cs" />
     <Compile Include="Source\Managers\ComponentManager.cs" />
     <Compile Include="Source\Managers\InputManager.cs" />
     <Compile Include="Source\Managers\PhysicsManager.cs" />
@@ -90,7 +89,7 @@
     <Compile Include="Source\Systems\CameraSystem.cs" />
     <Compile Include="Source\Systems\CollisionSystem.cs" />
     <Compile Include="Source\Systems\GamePadSystem.cs" />
-    <Compile Include="Source\Systems\HeightMapSystem.cs" />
+    <Compile Include="Source\Systems\HeightmapSystem.cs" />
     <Compile Include="Source\Systems\InputSystem.cs" />
     <Compile Include="Source\Systems\IRenderSystem.cs" />
     <Compile Include="Source\Systems\ISystem.cs" />
