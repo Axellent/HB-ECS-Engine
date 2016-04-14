@@ -49,8 +49,12 @@ namespace GameEngine
                 //move the camera to the object position
                 pos += t.position;
 
+                //update the camera up position
+                Vector3 cameraUp = new Vector3(0, 1, 0);
+                cameraUp = Vector3.Transform(cameraUp, Matrix.CreateFromQuaternion(t.rotation));
+
                 //update the view
-                c.viewMatrix = Matrix.CreateLookAt(pos, t.position, c.upDirection);
+                c.viewMatrix = Matrix.CreateLookAt(pos, t.position, cameraUp);
 
                 //update the projection
                // c.projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, c.aspectRatio, c.nearClipPlane, c.farClipPlane);
