@@ -14,32 +14,34 @@ namespace GameEngine
         private static int CAMERAMODE_CHASE = 1;
 
         private Vector3 origo = new Vector3(0f, 0f, 0f);
-        private Vector3 staticCameraPos = new Vector3(30.0f, 30.0f, 30.0f);
-
+        private Vector3 staticCameraPos = new Vector3(30.0f, 30.0f, -100f);
+        
         public void Update(GameTime gameTime)
         {
             //get the camera entity
-            Entity camera = ComponentManager.Instance.GetFirstComponentOfType<CameraComponent>();
+            Entity camera = ComponentManager.Instance.GetFirstEntityOfType<CameraComponent>();
 
             //get the camera component
             CameraComponent c = ComponentManager.Instance.GetEntityComponent<CameraComponent>(camera);
 
-            //get the target entity (used in chase camera mode)
-            Entity targetEntity = c.targetEntity;
-
             //a static camera that looks at origo
             if(c.cameraMode == CAMERAMODE_STATIC)
             {
-                
+                c.viewMatrix = Matrix.CreateLookAt(c.position, c.target, c.upDirection);
             }
 
-            if (c.cameraMode == CAMERAMODE_CHASE && targetEntity!=null)
+            System.Console.WriteLine("X:" + c.position.X + "Y:" + c.position.Y + "Z:" + c.position.Z);
+
+            if (c.targetEntity!=null)
             {
+                List<Entity> elist = ComponentManager.Instance.GetAllEntitiesWithComponentType<ModelComponent>();
+                Entity e = ComponentManager.Instance.GetEntityWithTag(c.targetEntity,elist);
+
                 //set the camera behind the target object
-                Vector3 pos = new Vector3(0, 0.1f, 0.62f);
+                Vector3 pos = c.camChasePosition;
 
                 //get transform component from the entity the camera i following
-                TransformComponent t = ComponentManager.Instance.GetEntityComponent<TransformComponent>(targetEntity);
+                TransformComponent t = ComponentManager.Instance.GetEntityComponent<TransformComponent>(e);
 
                 //get the rotation
                 pos = Vector3.Transform(pos, Matrix.CreateFromQuaternion(t.rotation));
@@ -51,111 +53,7 @@ namespace GameEngine
                 c.viewMatrix = Matrix.CreateLookAt(pos, t.position, c.upDirection);
 
                 //update the projection
-                c.projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, c.aspectRatio, c.nearClipPlane, c.farClipPlane);
-            }
-        }
-
-        public void SetCameraToStatic()
-        {
-            //get the camera entity
-            Entity camera = ComponentManager.Instance.GetFirstComponentOfType<CameraComponent>();
-
-            //get the camera component
-            CameraComponent c = ComponentManager.Instance.GetEntityComponent<CameraComponent>(camera);
-
-            c.position = staticCameraPos;
-            c.target = origo;
-        }
-
-        public void SetTargetEntity(string EntityTag)
-        {
-            List<Entity> entities = ComponentManager.Instance.GetAllEntitiesWithComponentType<ModelComponent>();
-
-            Entity camEnt = ComponentManager.Instance.GetFirstComponentOfType<CameraComponent>();
-            CameraComponent c = ComponentManager.Instance.GetEntityComponent<CameraComponent>(camEnt);
-
-            foreach (Entity e in entities)
-            {
-                TagComponent t = ComponentManager.Instance.GetEntityComponent<TagComponent>(e);
-                if(t.tagName.Equals(EntityTag))
-                {
-                    c.targetEntity = e;
-                }
-            }
-        }
-
-        public void SetCameraLookAt(Vector3 target)
-        {
-            //get the camera entity
-            Entity camera = ComponentManager.Instance.GetFirstComponentOfType<CameraComponent>();
-
-            //get the camera component
-            CameraComponent c = ComponentManager.Instance.GetEntityComponent<CameraComponent>(camera);
-
-            //set the camera to look at the target
-            c.target = target;
-        }
-
-        public void SetCameraPosition(Vector3 cameraPosition)
-        {
-            //get the camera entity
-            Entity camera = ComponentManager.Instance.GetFirstComponentOfType<CameraComponent>();
-
-            //get the camera component
-            CameraComponent c = ComponentManager.Instance.GetEntityComponent<CameraComponent>(camera);
-
-            //set the camera position
-            c.position = cameraPosition;
-        }
-
-        public void SetCameraFieldOfView(int degrees)
-        {
-            //get the camera entity
-            Entity camera = ComponentManager.Instance.GetFirstComponentOfType<CameraComponent>();
-
-            //get the camera component
-            CameraComponent c = ComponentManager.Instance.GetEntityComponent<CameraComponent>(camera);
-
-            //set field of view
-            c.fieldOfView = MathHelper.ToRadians(degrees);
-        }
-
-
-        public void SetNearClipPlane(float value)
-        {
-            List<Entity> entities = ComponentManager.Instance.GetAllEntitiesWithComponentType<CameraComponent>();
-            foreach (Entity enitity in entities)
-            {
-                CameraComponent c = ComponentManager.Instance.GetEntityComponent<CameraComponent>(enitity);
-
-                if (value <= 0)
-                {
-                    c.nearClipPlane = 1f;
-                }
-
-                c.nearClipPlane = value;
-            }
-        }
-
-        public void SetFarClipPlane(float value)
-        {
-            List<Entity> entities = ComponentManager.Instance.GetAllEntitiesWithComponentType<CameraComponent>();
-            foreach (Entity enitity in entities)
-            {
-                CameraComponent c = ComponentManager.Instance.GetEntityComponent<CameraComponent>(enitity);
-
-                if (value >= 10000)
-                {
-                    c.farClipPlane = 10000;
-                }
-                else if (value < 50)
-                {
-                    c.farClipPlane = 50;
-                }
-                else
-                {
-                    c.farClipPlane = value;
-                }
+               // c.projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, c.aspectRatio, c.nearClipPlane, c.farClipPlane);
             }
         }
     }

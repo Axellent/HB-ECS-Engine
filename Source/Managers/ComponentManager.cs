@@ -121,7 +121,7 @@ namespace GameEngine
         /// </summary>
         /// <typeparam name="T"> The type of the component </typeparam>
         /// <returns>A list with entities, else null </returns>
-        public Entity GetFirstComponentOfType<T>() where T : IComponent
+        public Entity GetFirstEntityOfType<T>() where T : IComponent
         {
             Type type = typeof(T);
 

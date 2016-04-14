@@ -5,8 +5,8 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ECS Engine")]
-[assembly: AssemblyProduct("ECS Engine")]
+[assembly: AssemblyTitle("GameEngine")]
+[assembly: AssemblyProduct("GameEngine")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyCompany("Microsoft")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("6a42666d-7102-4a1d-a440-099ce7b9a551")]
+[assembly: Guid("3502883d-09d5-474c-9dfc-d6e9317b8298")]
 
 // Version information for an assembly consists of the following four values:
 //

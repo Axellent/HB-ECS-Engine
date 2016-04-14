@@ -9,15 +9,6 @@ namespace GameEngine
 {
     public class TransformSystem : IUpdateSystem
     {
-        /// <summary>
-        /// This function rotates the given bone by the given matrix
-        /// </summary>
-        /// <param name="boneIndex"></param>
-        /// <param name="t"></param>
-        /* public void ChangeBoneTransform(ModelComponent m, int boneIndex, Matrix t)
-         {
-             //model.Bones[boneIndex].Transform = t * model.Bones[boneIndex].Transform;
-         }*/
         public void Update(GameTime gameTime)
         {
             List<Entity> entities = SceneManager.Instance.GetActiveScene().GetAllEntities();
@@ -26,10 +17,18 @@ namespace GameEngine
             {
                 TransformComponent t = ComponentManager.Instance.GetEntityComponent<TransformComponent>(e);
 
-                //Update world matrix
-                t.world = Matrix.CreateFromQuaternion(t.rotation)
-                                   * Matrix.CreateTranslation(t.position)
-                                   * Matrix.CreateScale(t.scale);
+                if (t != null)
+                {
+                    var qRotation = Quaternion.CreateFromYawPitchRoll(t.vRotation.X, t.vRotation.Y, t.vRotation.Z);
+                    t.rotation *= qRotation;
+                    t.forward = Vector3.Transform(Vector3.Forward, t.rotation);
+                    //Update world matrix
+                    t.world = Matrix.CreateScale(t.scale)
+                              * Matrix.CreateFromQuaternion(t.rotation)
+                              * Matrix.CreateTranslation(t.position);
+                                        
+
+                }
             }
         }
     }

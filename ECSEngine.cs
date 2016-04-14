@@ -22,6 +22,25 @@ namespace GameEngine
             return game.Content.Load<T>(name);
         }
 
+        public void StartEngine()
+        {
+            if (game == null)
+            {
+                using (game = new Game1(this, out gdm))
+                {  
+                    game.Run();
+                }
+            }            
+        }
+
+        public void StopEngine()
+        {
+            if (game != null)
+            {
+                game.Exit();
+            }
+        }
+
         public GraphicsDevice GetGraphicsDevice()
         {
             return game.GraphicsDevice;

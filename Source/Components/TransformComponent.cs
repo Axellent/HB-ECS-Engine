@@ -13,11 +13,15 @@ namespace GameEngine
         public Vector3 position { get; set; }
         public Vector3 scale { get; set; }
         public Quaternion rotation { get; set; }
+
+        public Vector3 vRotation { get; set; }
+        public Vector3 forward { get; set; }
+
         public TransformComponent()
         {
-            scale = new Vector3(1.0f, 1.0f, 1.0f);
+            scale = Vector3.One;
             rotation = Quaternion.Identity;
-            position = new Vector3(0f, 0f, 0f);
+            position = Vector3.Zero;
         }
     }
 }

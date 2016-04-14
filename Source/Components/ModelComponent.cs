@@ -14,13 +14,18 @@ namespace GameEngine
         public Model model {get;set;}
 
         public bool useBasicEffect { get; set; }
-        Dictionary<int, Vector3> MeshTransforms { get; set; }
+        public Dictionary<int, Matrix> MeshTransforms { get; set; }
 
         public ModelComponent(Model model, bool useBasicEffect)
         {
             this.model = model;
             this.useBasicEffect = useBasicEffect;
-            MeshTransforms = new Dictionary<int, Vector3>();
-        }        
+            MeshTransforms = new Dictionary<int, Matrix>();
+        }
+
+        public void AddMeshTransform(int bone,Matrix t)
+        {
+            MeshTransforms.Add(bone, t);
+        }
     }
 }

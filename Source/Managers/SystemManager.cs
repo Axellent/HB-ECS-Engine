@@ -29,7 +29,7 @@ namespace GameEngine
 
         Dictionary<string, Dictionary<Type, IUpdateSystem>> updateSystemDictionary = new Dictionary<string, Dictionary<Type, IUpdateSystem>>();
         Dictionary<string, Dictionary<Type, IRenderSystem>> renderSystemDictionary = new Dictionary<string, Dictionary<Type, IRenderSystem>>();
-
+        Dictionary<string, Dictionary<Type, IRender3DSystem>> render3DSystemDictionary = new Dictionary<string, Dictionary<Type, IRender3DSystem>>();
 
         /// <summary>
         /// 
@@ -60,7 +60,14 @@ namespace GameEngine
                     renderSystemDictionary[category] = new Dictionary<Type, IRenderSystem>();
                 }
                 renderSystemDictionary[category][system.GetType()] = (IRenderSystem)system;
-
+            }
+            if (system is IRender3DSystem)
+            {
+                if (!render3DSystemDictionary.ContainsKey(category))
+                {
+                    render3DSystemDictionary[category] = new Dictionary<Type, IRender3DSystem>();
+                }
+                render3DSystemDictionary[category][system.GetType()] = (IRender3DSystem)system;
             }
         }
 
@@ -91,6 +98,16 @@ namespace GameEngine
                     }
                 }
             }
+            else if (system is IRender3DSystem)
+            {
+                if (render3DSystemDictionary.ContainsKey(category))
+                {
+                    if (render3DSystemDictionary[category].ContainsKey(system))
+                    {
+                        render3DSystemDictionary[category].Remove(system);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -114,6 +131,13 @@ namespace GameEngine
                     renderSystemDictionary.Remove(category);
                 }
             }
+            else if (system is IRender3DSystem)
+            {
+                if (render3DSystemDictionary.ContainsKey(category))
+                {
+                    render3DSystemDictionary.Remove(category);
+                }
+            }
         }
 
         /// <summary>
@@ -121,8 +145,18 @@ namespace GameEngine
         /// </summary>
         /// <param name="spriteBatch"></param>
         /// <param name="gameTime"></param>
-        public void RunAllRenderSystems(SpriteBatch spriteBatch, GameTime gameTime)
+        internal void RunAllRenderSystems(GraphicsDevice graphicsDevice,SpriteBatch spriteBatch, GameTime gameTime)
         {
+            if (render3DSystemDictionary.Count > 0)
+            {
+                if (render3DSystemDictionary.ContainsKey(Category))
+                {
+                    foreach (IRender3DSystem ren3Dsys in render3DSystemDictionary[Category].Values)
+                    {
+                        ren3Dsys.Render(graphicsDevice, gameTime);
+                    }
+                }
+            }
             if (renderSystemDictionary.Count > 0)
             {
                 if (renderSystemDictionary.ContainsKey(Category))
@@ -139,7 +173,7 @@ namespace GameEngine
         /// 
         /// </summary>
         /// <param name="gameTime"></param>
-        public void RunAllUpdateSystems(GameTime gameTime)
+        internal void RunAllUpdateSystems(GameTime gameTime)
         {
             if (updateSystemDictionary.Count > 0)
             {
