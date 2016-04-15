@@ -7,7 +7,7 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{538B6139-9AC8-4119-8464-C6FB08AB52CC}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GameEngine</RootNamespace>
     <AssemblyName>GameEngine</AssemblyName>
@@ -37,6 +37,9 @@
   <PropertyGroup>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="ECSEngine.cs" />
     <Compile Include="Game1.cs" />
@@ -58,6 +61,7 @@
     <Compile Include="Source\Components\RectangleCollisionComponent.cs" />
     <Compile Include="Source\Components\Render2DComponent.cs" />
     <Compile Include="Source\Components\TagComponent.cs" />
+    <Compile Include="Source\Components\TerrainChunkComponent.cs" />
     <Compile Include="Source\Components\TerrainComponent.cs" />
     <Compile Include="Source\Components\TextRenderComponent.cs" />
     <Compile Include="Source\Components\TimerComponent.cs" />

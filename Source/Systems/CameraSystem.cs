@@ -10,11 +10,8 @@ namespace GameEngine
 {
     public class CameraSystem : IUpdateSystem
     {
-        private static int CAMERAMODE_STATIC = 0;
-        private static int CAMERAMODE_CHASE = 1;
-
         private Vector3 origo = new Vector3(0f, 0f, 0f);
-        private Vector3 staticCameraPos = new Vector3(30.0f, 30.0f, -100f);
+        private Vector3 staticCameraPos = new Vector3(30.0f, 30.0f, 30f);
         
         public void Update(GameTime gameTime)
         {
@@ -23,14 +20,6 @@ namespace GameEngine
 
             //get the camera component
             CameraComponent c = ComponentManager.Instance.GetEntityComponent<CameraComponent>(camera);
-
-            //a static camera that looks at origo
-            if(c.cameraMode == CAMERAMODE_STATIC)
-            {
-                c.viewMatrix = Matrix.CreateLookAt(c.position, c.target, c.upDirection);
-            }
-
-            System.Console.WriteLine("X:" + c.position.X + "Y:" + c.position.Y + "Z:" + c.position.Z);
 
             if (c.targetEntity!=null)
             {
@@ -58,6 +47,11 @@ namespace GameEngine
 
                 //update the projection
                // c.projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, c.aspectRatio, c.nearClipPlane, c.farClipPlane);
+            }
+            //Else, a static camera that looks at origo is set up.
+            else
+            {
+                c.viewMatrix = Matrix.CreateLookAt(c.position, c.target, c.upDirection);
             }
         }
     }

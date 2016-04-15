@@ -26,8 +26,6 @@ namespace GameEngine
                     t.world = Matrix.CreateScale(t.scale)
                               * Matrix.CreateFromQuaternion(t.rotation)
                               * Matrix.CreateTranslation(t.position);
-                                        
-
                 }
             }
         }

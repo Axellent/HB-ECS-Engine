@@ -27,5 +27,20 @@ namespace GameEngine
         {
             MeshTransforms.Add(bone, t);
         }
+        public void SetMeshTransform(int bone,Matrix t)
+        {
+            if(MeshTransforms.ContainsKey(bone))
+            {
+                MeshTransforms[bone] = t;
+            }
+        }
+
+        public void RemoveMeshTransform(int bone)
+        {
+            if (MeshTransforms.ContainsKey(bone))
+            {
+                MeshTransforms.Remove(bone);
+            }
+        }
     }
 }

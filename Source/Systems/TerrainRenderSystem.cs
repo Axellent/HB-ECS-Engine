@@ -22,14 +22,17 @@ namespace GameEngine
             {
                 if(transformComponent!=null)
                 {
+                    terrainComponent.effect.TextureEnabled = true;
+                    terrainComponent.effect.Texture = terrainComponent.terrainTex;
                     terrainComponent.effect.Projection = camera.projectionMatrix;
                     terrainComponent.effect.View = camera.viewMatrix;
                     terrainComponent.effect.World = transformComponent.world;
                     terrainComponent.effect.EnableDefaultLighting();
 
-                    RasterizerState r = new RasterizerState();
-                    r.CullMode = CullMode.None;
-                    graphicsDevice.RasterizerState = r;
+                    /*RasterizerState r = new RasterizerState();
+                    //r.CullMode = CullMode.None;
+                    r.FillMode = FillMode.WireFrame;
+                    graphicsDevice.RasterizerState = r;*/
 
                     foreach (EffectPass p in terrainComponent.effect.CurrentTechnique.Passes)
                     {

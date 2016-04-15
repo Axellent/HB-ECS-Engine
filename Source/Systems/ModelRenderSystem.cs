@@ -83,7 +83,7 @@ namespace GameEngine
                     effect.Projection = c.projectionMatrix;
                 }
                 mesh.Draw();
-                Console.WriteLine("Model.. X:" + t.position.X, " Y:" + t.position.Y +" Z:" + t.position.Z);
+                //Console.WriteLine("Model X:" + t.position.X + " Y:" + t.position.Y +" Z:" + t.position.Z);
             }
         }
 

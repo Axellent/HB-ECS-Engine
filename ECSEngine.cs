@@ -33,6 +33,11 @@ namespace GameEngine
             }            
         }
 
+        public void SetWindowTitle(string title)
+        {
+            game.Window.Title = title;
+        }
+
         public void StopEngine()
         {
             if (game != null)

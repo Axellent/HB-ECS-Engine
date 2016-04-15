@@ -11,34 +11,39 @@ namespace GameEngine
     public class TerrainComponent : IComponent
     {
         public VertexBuffer vBuffer { get; set; }
+
         public IndexBuffer iBuffer { get; set; }
         public BasicEffect effect { get; set; }
 
         public int indicesLenDiv3;
+
         public int width { get; set; }
         public int height { get; set; }
 
         public float[,] heightInfo;
 
         Texture2D terrainMap { get; set; }
+        public Texture2D terrainTex { get; set; }
 
-        public VertexPositionColorNormal[] vertices { get; set; }
+        public VertexPositionNormalTexture[] vertices { get; set; }
         public int[] indices { get; set; }
 
-        public TerrainComponent(GraphicsDevice graphicsDevice, Texture2D terrainMap)
+        public TerrainComponent(GraphicsDevice graphicsDevice, Texture2D terrainMap,Texture2D terrainTex)
         {
             effect = new BasicEffect(graphicsDevice);
+            this.terrainTex = terrainTex;
             LoadHighmap(terrainMap);
+
+            vertices = InitTerrainVertices();
 
             effect.FogEnabled = true;
             effect.FogStart = 10f;
             effect.FogColor = Color.LightGray.ToVector3();
             effect.FogEnd = 400f;
-            InitVertices();
             InitIndices();
             InitNormals();
             PrepareBuffers(graphicsDevice);
-            effect.VertexColorEnabled = true;
+            effect.VertexColorEnabled = false;
         }
 
         private void LoadHighmap(Texture2D terrainMap)
@@ -57,7 +62,7 @@ namespace GameEngine
             {
                 for (int y = 0; y < height; ++y)
                 {
-                    heightInfo[x, y] = colors[x + y * width].R / 4f;
+                    heightInfo[x, y] = colors[x + y * width].R / 5f;
                 }
             }
         }
@@ -117,61 +122,84 @@ namespace GameEngine
             }
         }
 
-        private void InitVertices()
+        private VertexPositionNormalTexture[] InitTerrainVertices()
         {
-            float minH = float.MaxValue;
-            float maxH = float.MinValue;
+            VertexPositionNormalTexture[] terrainVerts = new VertexPositionNormalTexture[width * height];
 
-            for (int x = 0; x < width; ++x)
+            for (int x = 0; x < width; x++)
             {
-                for (int y = 0; y < height; ++y)
+                for (int y = 0; y < height; y++)
                 {
-                    if (heightInfo[x, y] < minH)
-                    {
-                        minH = heightInfo[x, y];
-                    }
-                    if (heightInfo[x, y] > maxH)
-                    {
-                        maxH = heightInfo[x, y];
-                    }
+                    terrainVerts[x + y * height].Position = new Vector3(x, heightInfo[x, y], -y);
+                    terrainVerts[x + y * height].TextureCoordinate.X = (float)x / 30.0f;
+                    terrainVerts[x + y * height].TextureCoordinate.Y = (float)y / 30.0f;
                 }
             }
 
-            vertices = new VertexPositionColorNormal[width * height];
-
-            //this codes creates the nice canyon look! :)
-            for (int x = 0; x < width; ++x)
-            {
-                for (int y = 0; y < height; ++y)
-                {
-                    vertices[x + y * width].Position = new Vector3(x, heightInfo[x, y], y);
-
-                    if (heightInfo[x, y] < minH + (maxH - minH) / 4)
-                    {
-                        vertices[x + y * width].Color = Color.SandyBrown;
-                    }
-                    else if (heightInfo[x, y] < minH + (maxH - minH) * 2 / 4)
-                    {
-                        vertices[x + y * width].Color = Color.BurlyWood;
-                    }
-                    else if (heightInfo[x, y] < minH + (maxH - minH) * 3 / 4)
-                    {
-                        vertices[x + y * width].Color = Color.SandyBrown;
-                    }
-                    else
-                    {
-                        vertices[x + y * width].Color = Color.Chocolate;
-                    }
-                }
-            }
+            return terrainVerts;
         }
+
 
         private void PrepareBuffers(GraphicsDevice graphicsDevice)
         {
             iBuffer = new IndexBuffer(graphicsDevice, typeof(int), indices.Length, BufferUsage.WriteOnly);
             iBuffer.SetData(indices);
-            vBuffer = new VertexBuffer(graphicsDevice, VertexPositionColorNormal.VertexDeclaration, vertices.Length, BufferUsage.WriteOnly);
+
+            vBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionNormalTexture), vertices.Length, BufferUsage.WriteOnly);
             vBuffer.SetData(vertices);
+        }
+
+        public void SetTerrainTexture(Texture2D texture)
+        {
+            this.terrainTex = texture;
+        }
+
+        public float GetTerrainHeight(float x, float z)
+        {
+            if (x < 0
+                || z < 0
+                || x > heightInfo.GetLength(0) - 1
+                || z > heightInfo.GetLength(1) - 1)
+            {
+                return 10f;
+            }
+            //find the two x vertices
+            int xLow = (int)x;
+            int xHigh = xLow + 1;
+            //get the relative x value between the two points
+            float xRel = (x - xLow) / ((float)xHigh - (float)xLow);
+
+            //find the two z verticies
+            int zLow = (int)z;
+            int zHigh = zLow + 1;
+
+            //get the relative z value between the two points
+            float zRel = (z - zLow) / ((float)zHigh - (float)zLow);
+
+            //get the minY and MaxY values from the four vertices
+            float heightLowXLowZ = heightInfo[xLow, zLow];
+            float heightLowXHighZ = heightInfo[xLow, zHigh];
+            float heightHighXLowZ = heightInfo[xHigh, zLow];
+            float heightHighXHighZ = heightInfo[xHigh, zHigh];
+
+            //test if the position is above the low triangle
+            bool posAboveLowTriangle = (xRel + zRel < 1);
+
+            float resultHeight;
+
+            if (posAboveLowTriangle)
+            {
+                resultHeight = heightLowXLowZ;
+                resultHeight += zRel * (heightLowXHighZ - heightLowXLowZ);
+                resultHeight += xRel * (heightHighXLowZ - heightLowXLowZ);
+            }
+            else
+            {
+                resultHeight = heightHighXHighZ;
+                resultHeight += (1.0f - zRel) * (heightHighXLowZ - heightHighXHighZ);
+                resultHeight += (1.0f - xRel) * (heightLowXHighZ - heightHighXHighZ);
+            }
+            return resultHeight;
         }
     }
 }
