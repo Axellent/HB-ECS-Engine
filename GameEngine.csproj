@@ -61,8 +61,11 @@
     <Compile Include="Source\Components\RectangleCollisionComponent.cs" />
     <Compile Include="Source\Components\Render2DComponent.cs" />
     <Compile Include="Source\Components\TagComponent.cs" />
+    <Compile Include="Source\Components\TerrainChunk.cs" />
     <Compile Include="Source\Components\TerrainChunkComponent.cs" />
     <Compile Include="Source\Components\TerrainComponent.cs" />
+    <Compile Include="Source\Components\TerrainMapComponent.cs" />
+    <Compile Include="Source\Components\TerrainTestComponent.cs" />
     <Compile Include="Source\Components\TextRenderComponent.cs" />
     <Compile Include="Source\Components\TimerComponent.cs" />
     <Compile Include="Source\Components\TransformComponent.cs" />
@@ -100,6 +103,8 @@
     <Compile Include="Source\Systems\MoveSystem.cs" />
     <Compile Include="Source\Systems\ParentSystem.cs" />
     <Compile Include="Source\Systems\SpriteRenderSystem.cs" />
+    <Compile Include="Source\Systems\TerrainChunkRenderSystem.cs" />
+    <Compile Include="Source\Systems\TerrainMapRenderSystem.cs" />
     <Compile Include="Source\Systems\TerrainRenderSystem.cs" />
     <Compile Include="Source\Systems\TextRenderSystem.cs" />
     <Compile Include="Source\Systems\TimerSystem.cs" />
