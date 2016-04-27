@@ -38,7 +38,7 @@ namespace GameEngine
                         if (m != null)
                         {
                             //loop through all mesh transforms in the model
-                            foreach (var pair in m.MeshTransforms)
+                            foreach (var pair in m.meshTransforms)
                             {
                                 //update the model transforms
                                 ChangeBoneTransform(m, pair.Key, pair.Value);
@@ -61,6 +61,7 @@ namespace GameEngine
                 }
             }
         }
+
         private void RenderBasicEffectModel(ModelComponent modelComp,TransformComponent t, CameraComponent c)
         {
             /*
@@ -95,6 +96,27 @@ namespace GameEngine
         private void ChangeBoneTransform(ModelComponent modelComp,int boneIndex, Matrix t)
         {
             modelComp.model.Bones[boneIndex].Transform = t * modelComp.model.Bones[boneIndex].Transform;
+        }
+
+        public static void AddMeshTransform(ref ModelComponent model, int bone, Matrix t) {
+            model.meshTransforms.Add(bone, t);
+        }
+
+        public static void SetMeshTransform(ref ModelComponent model, int bone, Matrix t) {
+            if (model.meshTransforms.ContainsKey(bone)) {
+                model.meshTransforms[bone] = t;
+            }
+        }
+
+        public static void RemoveMeshTransform(ref ModelComponent model, int bone) {
+            if (model.meshTransforms.ContainsKey(bone)) {
+                model.meshTransforms.Remove(bone);
+            }
+        }
+
+        public static void ResetMeshTransforms(ref ModelComponent model) {
+            SetMeshTransform(ref model, 1, Matrix.CreateRotationY(0.0f));
+            SetMeshTransform(ref model, 3, Matrix.CreateRotationY(0.0f));
         }
     }
 }
