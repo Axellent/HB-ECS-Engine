@@ -64,7 +64,6 @@
     <Compile Include="Source\Components\Render2DComponent.cs" />
     <Compile Include="Source\Components\TagComponent.cs" />
     <Compile Include="Source\Components\TerrainChunk.cs" />
-    <Compile Include="Source\Components\TerrainComponent.cs" />
     <Compile Include="Source\Components\TerrainMapComponent.cs" />
     <Compile Include="Source\Components\TextRenderComponent.cs" />
     <Compile Include="Source\Components\TimerComponent.cs" />
@@ -82,7 +81,6 @@
     <Compile Include="Source\Engine\InputDefines.cs" />
     <Compile Include="Source\Engine\Music.cs" />
     <Compile Include="Source\Engine\Scene.cs" />
-    <Compile Include="Source\InputDefines.cs" />
     <Compile Include="Source\Managers\ComponentManager.cs" />
     <Compile Include="Source\Managers\InputManager.cs" />
     <Compile Include="Source\Managers\PhysicsManager.cs" />
@@ -107,7 +105,6 @@
     <Compile Include="Source\Systems\ParentSystem.cs" />
     <Compile Include="Source\Systems\SpriteRenderSystem.cs" />
     <Compile Include="Source\Systems\TerrainMapRenderSystem.cs" />
-    <Compile Include="Source\Systems\TerrainRenderSystem.cs" />
     <Compile Include="Source\Systems\TextRenderSystem.cs" />
     <Compile Include="Source\Systems\TimerSystem.cs" />
     <Compile Include="Source\Systems\TransformSystem.cs" />
