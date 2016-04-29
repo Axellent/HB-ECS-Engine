@@ -12,6 +12,9 @@ namespace GameEngine
     public class ModelComponent : IComponent
     {
         public Model model {get;set;}
+        public bool textured { get; set; }
+
+        public Texture2D texture;
 
         public bool useBasicEffect { get; set; }
         public Dictionary<int, Matrix> MeshTransforms { get; set; }
@@ -41,6 +44,10 @@ namespace GameEngine
             {
                 MeshTransforms.Remove(bone);
             }
+        }
+        public void SetTexture(Texture2D texture)
+        {
+            this.texture = texture;
         }
     }
 }

@@ -30,9 +30,9 @@ namespace GameEngine
                     terrainComponent.effect.EnableDefaultLighting();
 
                     /*RasterizerState r = new RasterizerState();
-                    //r.CullMode = CullMode.None;
-                    r.FillMode = FillMode.WireFrame;
-                    graphicsDevice.RasterizerState = r;*/
+                    r.CullMode = CullMode.None;
+                    //r.FillMode = FillMode.WireFrame;
+                    graphicsDevice.RasterizerState = r;//*/
 
                     foreach (EffectPass p in terrainComponent.effect.CurrentTechnique.Passes)
                     {

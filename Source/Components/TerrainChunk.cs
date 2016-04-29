@@ -8,12 +8,16 @@ using Microsoft.Xna.Framework;
 
 namespace GameEngine
 {
-    public class TerrainComponent : IComponent
+    public class TerrainChunk
     {
         public VertexBuffer vBuffer { get; set; }
 
         public IndexBuffer iBuffer { get; set; }
         public BasicEffect effect { get; set; }
+
+        public BoundingBox boundingBox { get; set; }
+
+        public Vector3 offsetPosition { get; set; }
 
         public int indicesLenDiv3;
 
@@ -21,35 +25,50 @@ namespace GameEngine
         public int height { get; set; }
 
         public float[,] heightInfo;
-
-        Texture2D terrainMap { get; set; }
         public Texture2D terrainTex { get; set; }
 
         public VertexPositionNormalTexture[] vertices { get; set; }
         public int[] indices { get; set; }
 
-        public TerrainComponent(GraphicsDevice graphicsDevice, Texture2D terrainMap,Texture2D terrainTex)
+        private Rectangle terrainRect;
+
+        public TerrainChunk(GraphicsDevice graphicsDevice, Texture2D terrainMap, Rectangle terrainRect,Vector3 offsetPosition, VertexPositionNormalTexture[] vertexNormals)
         {
             effect = new BasicEffect(graphicsDevice);
-            this.terrainTex = terrainTex;
-            LoadHighmap(terrainMap);
+            this.terrainRect = terrainRect;
 
+            //set the offset position. Used for drawing the chunk at the right position
+            this.offsetPosition = offsetPosition;
+            
+            CreateHightmap(terrainMap);
+            
             vertices = InitTerrainVertices();
+
+            //create the bounding box from the vertices
+            boundingBox = CreateBoundingBox(vertices);
 
             effect.FogEnabled = true;
             effect.FogStart = 10f;
             effect.FogColor = Color.LightGray.ToVector3();
             effect.FogEnd = 400f;
+
             InitIndices();
-            InitNormals();
+            //copy the calculated normal values
+            CopyNormals(vertexNormals);
+
             PrepareBuffers(graphicsDevice);
-            effect.VertexColorEnabled = false;
         }
 
-        private void LoadHighmap(Texture2D terrainMap)
+        private void CopyNormals(VertexPositionNormalTexture[] vertexNormals)
         {
-            this.terrainMap = terrainMap;
+            for(int i =0; i<vertices.Length;++i)
+            {
+                vertices[i].Normal = vertexNormals[i].Normal;
+            }
+        }
 
+        private void CreateHightmap(Texture2D terrainMap)
+        {
             width = terrainMap.Width;
             height = terrainMap.Height;
 
@@ -57,14 +76,17 @@ namespace GameEngine
             Color[] colors = new Color[width * height];
             terrainMap.GetData(colors);
 
-            heightInfo = new float[width, height];
-            for (int x = 0; x < width; ++x)
+            //copy the desired portion of the map
+            heightInfo = new float[terrainRect.Width, terrainRect.Height];
+            for (int x = terrainRect.X; x < terrainRect.X + terrainRect.Width; ++x)
             {
-                for (int y = 0; y < height; ++y)
+                for (int y = terrainRect.Y; y < terrainRect.Y + terrainRect.Height; ++y)
                 {
-                    heightInfo[x, y] = colors[x + y * width].R / 5f;
+                    heightInfo[x - terrainRect.X, y - terrainRect.Y] = colors[x + y * width].R / 5f;
                 }
             }
+            width = terrainRect.Width;
+            height = terrainRect.Height;
         }
 
         private void InitIndices()
@@ -72,9 +94,9 @@ namespace GameEngine
             indices = new int[(width - 1) * (height - 1) * 6];
             int indicesCount = 0; ;
 
-            for (int y = 0; y < height-1;++y)
+            for (int y = 0; y < height - 1; ++y)
             {
-                for(int x=0;x<width -1; ++x)
+                for (int x = 0; x < width - 1; ++x)
                 {
                     int botLeft = x + y * width;
                     int botRight = (x + 1) + y * width;
@@ -93,16 +115,15 @@ namespace GameEngine
 
             indicesLenDiv3 = indices.Length / 3;
         }
-
         private void InitNormals()
         {
             int indicesLen = indices.Length / 3;
-            for(int i=0;i< vertices.Length;++i)
+            for (int i = 0; i < vertices.Length; ++i)
             {
                 vertices[i].Normal = new Vector3(0f, 0f, 0f);
             }
 
-            for(int i=0;i< indicesLen; ++i)
+            for (int i = 0; i < indicesLen; ++i)
             {
                 //get indices indexes
                 int i1 = indices[i * 3];
@@ -132,14 +153,12 @@ namespace GameEngine
                 for (int y = 0; y < height; y++)
                 {
                     terrainVerts[x + y * height].Position = new Vector3(x, heightInfo[x, y], -y);
-                    terrainVerts[x + y * height].TextureCoordinate.X = (float)x / 30.0f;
-                    terrainVerts[x + y * height].TextureCoordinate.Y = (float)y / 30.0f;
+                    terrainVerts[x + y * height].TextureCoordinate.X = (float)x  / (width - 1.0f);
+                    terrainVerts[x + y * height].TextureCoordinate.Y = (float)y / (height - 1.0f);
                 }
             }
-
             return terrainVerts;
         }
-
 
         private void PrepareBuffers(GraphicsDevice graphicsDevice)
         {
@@ -150,57 +169,21 @@ namespace GameEngine
             vBuffer.SetData(vertices);
         }
 
-        public void SetTerrainTexture(Texture2D texture)
+        public void SetTexture(Texture2D texture)
         {
             this.terrainTex = texture;
         }
 
-        public float GetTerrainHeight(float x, float z)
+        private BoundingBox CreateBoundingBox(VertexPositionNormalTexture[] vertexArray)
         {
-            if (x < 0
-                || z < 0
-                || x > heightInfo.GetLength(0) - 1
-                || z > heightInfo.GetLength(1) - 1)
+            List<Vector3> points = new List<Vector3>();
+            foreach (VertexPositionNormalTexture v in vertexArray)
             {
-                return 10f;
+                points.Add(v.Position);
             }
-            //find the two x vertices
-            int xLow = (int)x;
-            int xHigh = xLow + 1;
-            //get the relative x value between the two points
-            float xRel = (x - xLow) / ((float)xHigh - (float)xLow);
-
-            //find the two z verticies
-            int zLow = (int)z;
-            int zHigh = zLow + 1;
-
-            //get the relative z value between the two points
-            float zRel = (z - zLow) / ((float)zHigh - (float)zLow);
-
-            //get the minY and MaxY values from the four vertices
-            float heightLowXLowZ = heightInfo[xLow, zLow];
-            float heightLowXHighZ = heightInfo[xLow, zHigh];
-            float heightHighXLowZ = heightInfo[xHigh, zLow];
-            float heightHighXHighZ = heightInfo[xHigh, zHigh];
-
-            //test if the position is above the low triangle
-            bool posAboveLowTriangle = (xRel + zRel < 1);
-
-            float resultHeight;
-
-            if (posAboveLowTriangle)
-            {
-                resultHeight = heightLowXLowZ;
-                resultHeight += zRel * (heightLowXHighZ - heightLowXLowZ);
-                resultHeight += xRel * (heightHighXLowZ - heightLowXLowZ);
-            }
-            else
-            {
-                resultHeight = heightHighXHighZ;
-                resultHeight += (1.0f - zRel) * (heightHighXLowZ - heightHighXHighZ);
-                resultHeight += (1.0f - xRel) * (heightLowXHighZ - heightHighXHighZ);
-            }
-            return resultHeight;
+            BoundingBox b = BoundingBox.CreateFromPoints(points);
+            return b;
         }
+
     }
 }

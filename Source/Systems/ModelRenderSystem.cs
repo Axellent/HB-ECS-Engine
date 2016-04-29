@@ -11,20 +11,33 @@ namespace GameEngine
 {
     public class ModelRenderSystem : IRender3DSystem
     {
+        DebugRenderBoundingBox boxRenderer;
+        BoundingBoxToWorldSpace boxConvert;
+        bool renderBoxInitialised = false;
+
+        private bool modelInCameraFrustrum=false;
+
         public void Render(GraphicsDevice graphicsDevice, GameTime gameTime)
         {
+            if (renderBoxInitialised.Equals(false))
+            {
+                boxConvert = new BoundingBoxToWorldSpace();
+                boxRenderer = new DebugRenderBoundingBox(graphicsDevice);
+                renderBoxInitialised = true;
+            }
+
             List<List<Entity>> sceneEntities = SceneManager.Instance.GetActiveScene().GetAllLayers();
             Entity Ecamera = ComponentManager.Instance.GetFirstEntityOfType<CameraComponent>();
             CameraComponent c = ComponentManager.Instance.GetEntityComponent<CameraComponent>(Ecamera);
+            Entity modelCount = ComponentManager.Instance.GetFirstEntityOfType<ModelCountComponent>();
+            ModelCountComponent modelsInView = ComponentManager.Instance.GetEntityComponent<ModelCountComponent>(modelCount);
 
-            if (sceneEntities == null)
+            if (sceneEntities == null || c == null)
             {
                 return;
             }
-            if(c == null)
-            {
-                return;
-            }
+            if (modelsInView != null)
+                modelsInView.numModelsInView = 0;
 
             for (int i = 0; i < sceneEntities.Count; ++i)
             {
@@ -33,6 +46,7 @@ namespace GameEngine
                     if (entity.Visible)
                     {
                         ModelComponent m = ComponentManager.Instance.GetEntityComponent<ModelComponent>(entity);
+                        ModelBoundingBoxComponent b = ComponentManager.Instance.GetEntityComponent<ModelBoundingBoxComponent>(entity);
 
                         //if the entity has a model component
                         if (m != null)
@@ -48,14 +62,47 @@ namespace GameEngine
                             //if there is a transform component
                             if (t != null)
                             {
-                                //If the model uses monogames built-in basic effects
-                                if (m.useBasicEffect)
+                                //if the model has bounding boxes
+                                if(b!=null)
                                 {
-                                    //render the model with basic effects
-                                    RenderBasicEffectModel(m, t, c);
+                                    modelInCameraFrustrum = false;
+                                    foreach (BoundingBox bb in b.boundingBoxes)
+                                    {
+                                        Vector3 leftRightVector = Matrix.Transpose(c.viewMatrix).Right;
+                                        boxRenderer.RenderBoundingBox(bb, t.world, c.viewMatrix, c.projectionMatrix);
+                                        BoundingBox box = boxConvert.ConvertBoundingBoxToWorldCoords(b.boundingBoxes[0], Matrix.CreateTranslation(t.position));
+                                        BoundingSphere s = BoundingSphere.CreateFromBoundingBox(box);
+                                        
+                                        if (c.cameraFrustrum.Contains(s) != ContainmentType.Disjoint)
+                                        {
+                                            modelInCameraFrustrum = true;
+                                            break;
+                                        }
+                                    }
+                                    if(modelInCameraFrustrum==true)
+                                    {
+                                        if (modelsInView != null)
+                                            modelsInView.numModelsInView++;
+
+                                        //If the model uses monogames built-in basic effects
+                                        if (m.useBasicEffect)
+                                        {
+                                            //render the model with basic effects
+                                            RenderBasicEffectModel(m, t, c);
+                                        }
+                                    }
+                                }
+                                //if the model doesn't have any bounding boxes
+                                else
+                                {
+                                    //If the model uses monogames built-in basic effects
+                                    if (m.useBasicEffect)
+                                    {
+                                        //render the model with basic effects
+                                        RenderBasicEffectModel(m, t, c);
+                                    }
                                 }
                             }
-
                         }
                     }
                 }
@@ -77,6 +124,11 @@ namespace GameEngine
                 foreach (BasicEffect effect in mesh.Effects)
                 {
                     effect.EnableDefaultLighting();
+                    if (modelComp.textured == true)
+                    {
+                        effect.TextureEnabled = true;
+                        effect.Texture = modelComp.texture;
+                    }
 
                     effect.World = transforms[mesh.ParentBone.Index] * t.world;
                     effect.View = c.viewMatrix;

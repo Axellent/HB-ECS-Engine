@@ -3,55 +3,59 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace GameEngine
 {
-    public class TerrainComponent : IComponent
+    public class TerrainMapComponent : IComponent
     {
-        public VertexBuffer vBuffer { get; set; }
+        public List<TerrainChunk> terrainChunks {get;set;}
+        public Texture2D terrainHeightMap { get; set; }
 
-        public IndexBuffer iBuffer { get; set; }
-        public BasicEffect effect { get; set; }
-
-        public int indicesLenDiv3;
-
-        public int width { get; set; }
-        public int height { get; set; }
+        private Texture2D terrainMap;
 
         public float[,] heightInfo;
 
-        Texture2D terrainMap { get; set; }
-        public Texture2D terrainTex { get; set; }
+        private int numChunks;
+
+        public int numChunksInView { get; set; }
+
+        private int clipX, clipY;
+        private int clipW, clipH;
+        private int hmWidth, hmHeight;
 
         public VertexPositionNormalTexture[] vertices { get; set; }
         public int[] indices { get; set; }
 
-        public TerrainComponent(GraphicsDevice graphicsDevice, Texture2D terrainMap,Texture2D terrainTex)
+        public TerrainMapComponent(GraphicsDevice graphicsDevice,Texture2D HeightmapTexture,Texture2D defaultTexture,int numChunks)
         {
-            effect = new BasicEffect(graphicsDevice);
-            this.terrainTex = terrainTex;
-            LoadHighmap(terrainMap);
-
+            terrainChunks = new List<TerrainChunk>();
+            terrainHeightMap = HeightmapTexture;
+            hmWidth = terrainHeightMap.Width;
+            hmHeight = terrainHeightMap.Height;
+            LoadHighmap(HeightmapTexture);
             vertices = InitTerrainVertices();
-
-            effect.FogEnabled = true;
-            effect.FogStart = 10f;
-            effect.FogColor = Color.LightGray.ToVector3();
-            effect.FogEnd = 400f;
             InitIndices();
             InitNormals();
-            PrepareBuffers(graphicsDevice);
-            effect.VertexColorEnabled = false;
+
+            this.numChunks = numChunks;
+
+            //Get clip width and clip height.
+            clipW = hmWidth / numChunks;
+            clipH = hmHeight / numChunks;
+
+            //setup the terrain chunks
+            SetupTerrainChunks(graphicsDevice, defaultTexture);
+            CorrectChunkPositions();
         }
 
         private void LoadHighmap(Texture2D terrainMap)
         {
             this.terrainMap = terrainMap;
 
-            width = terrainMap.Width;
-            height = terrainMap.Height;
+            int width = terrainMap.Width;
+            int height = terrainMap.Height;
 
             //get the pixels from the terrain map
             Color[] colors = new Color[width * height];
@@ -69,17 +73,17 @@ namespace GameEngine
 
         private void InitIndices()
         {
-            indices = new int[(width - 1) * (height - 1) * 6];
+            indices = new int[(hmWidth - 1) * (hmHeight - 1) * 6];
             int indicesCount = 0; ;
 
-            for (int y = 0; y < height-1;++y)
+            for (int y = 0; y < hmHeight - 1; ++y)
             {
-                for(int x=0;x<width -1; ++x)
+                for (int x = 0; x < hmWidth - 1; ++x)
                 {
-                    int botLeft = x + y * width;
-                    int botRight = (x + 1) + y * width;
-                    int topLeft = x + (y + 1) * width;
-                    int topRight = (x + 1) + (y + 1) * width;
+                    int botLeft = x + y * hmWidth;
+                    int botRight = (x + 1) + y * hmWidth;
+                    int topLeft = x + (y + 1) * hmWidth;
+                    int topRight = (x + 1) + (y + 1) * hmWidth;
 
                     indices[indicesCount++] = topLeft;
                     indices[indicesCount++] = botRight;
@@ -90,19 +94,16 @@ namespace GameEngine
                     indices[indicesCount++] = botRight;
                 }
             }
-
-            indicesLenDiv3 = indices.Length / 3;
         }
-
         private void InitNormals()
         {
             int indicesLen = indices.Length / 3;
-            for(int i=0;i< vertices.Length;++i)
+            for (int i = 0; i < vertices.Length; ++i)
             {
                 vertices[i].Normal = new Vector3(0f, 0f, 0f);
             }
 
-            for(int i=0;i< indicesLen; ++i)
+            for (int i = 0; i < indicesLen; ++i)
             {
                 //get indices indexes
                 int i1 = indices[i * 3];
@@ -125,34 +126,67 @@ namespace GameEngine
 
         private VertexPositionNormalTexture[] InitTerrainVertices()
         {
-            VertexPositionNormalTexture[] terrainVerts = new VertexPositionNormalTexture[width * height];
+            VertexPositionNormalTexture[] terrainVerts = new VertexPositionNormalTexture[hmWidth * hmHeight];
 
-            for (int x = 0; x < width; x++)
+            for (int x = 0; x < hmWidth; x++)
             {
-                for (int y = 0; y < height; y++)
+                for (int y = 0; y < hmHeight; y++)
                 {
-                    terrainVerts[x + y * height].Position = new Vector3(x, heightInfo[x, y], -y);
-                    terrainVerts[x + y * height].TextureCoordinate.X = (float)x / 30.0f;
-                    terrainVerts[x + y * height].TextureCoordinate.Y = (float)y / 30.0f;
+                    terrainVerts[x + y * hmHeight].Position = new Vector3(x, heightInfo[x, y], -y);
+                    terrainVerts[x + y * hmHeight].TextureCoordinate.X = (float)x / 30.0f;
+                    terrainVerts[x + y * hmHeight].TextureCoordinate.Y = (float)y / 30.0f;
                 }
             }
 
             return terrainVerts;
         }
 
-
-        private void PrepareBuffers(GraphicsDevice graphicsDevice)
+        public VertexPositionNormalTexture[] GetVertexTextureNormals(Rectangle rect)
         {
-            iBuffer = new IndexBuffer(graphicsDevice, typeof(int), indices.Length, BufferUsage.WriteOnly);
-            iBuffer.SetData(indices);
+            VertexPositionNormalTexture[] terrainVerts = new VertexPositionNormalTexture[rect.Width * rect.Height];
 
-            vBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionNormalTexture), vertices.Length, BufferUsage.WriteOnly);
-            vBuffer.SetData(vertices);
+            for (int x = rect.X; x < rect.X + rect.Width; x++)
+            {
+                for (int y = rect.Y; y < rect.Y + rect.Height; y++)
+                {
+                    terrainVerts[(x - rect.X) + (y - rect.Y) * rect.Height].Normal = vertices[x + y * hmHeight].Normal;
+                }
+            }
+            return terrainVerts;
         }
 
-        public void SetTerrainTexture(Texture2D texture)
+
+        private void SetupTerrainChunks(GraphicsDevice graphicsDevice, Texture2D defaultTexture)
         {
-            this.terrainTex = texture;
+            //loop through all the chunks to cut out from the heightmap
+            for(clipX = 0; clipX <hmWidth-1;clipX+=clipW)
+            {
+                for (clipY = 0; clipY < hmHeight-1; clipY += clipH)
+                {
+                    //use this line to see the chunks (don't use in real game)
+                    //TerrainChunk t = new TerrainChunk(graphicsDevice, terrainHeightMap, new Rectangle(clipX, clipY, clipW, clipH ),
+                    //                 new Vector3(clipX, 0, -clipY), GetVertexTextureNormals(new Rectangle(clipX, clipY, clipW , clipH )));
+                    Rectangle clipRect = new Rectangle(clipX, clipY, clipW + 1, clipH + 1);
+                    TerrainChunk t = new TerrainChunk(graphicsDevice, terrainHeightMap, clipRect, 
+                                     new Vector3(clipX,0,-clipY),GetVertexTextureNormals(clipRect));
+
+                    //apply the default texture to the chunk, so that it is visible
+                    t.SetTexture(defaultTexture);
+
+                    //add the chunk to the chunklist
+                    terrainChunks.Add(t);
+                }
+            }
+        }
+
+        private void CorrectChunkPositions()
+        {
+            terrainChunks[1].offsetPosition += new Vector3(0, 0, 0);
+        }
+
+        public void SetTextureToChunk(int chunk,Texture2D texture)
+        {
+            terrainChunks[chunk].SetTexture(texture);
         }
 
         public float GetTerrainHeight(float x, float z)

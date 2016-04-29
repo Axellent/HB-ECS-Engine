@@ -25,6 +25,7 @@ namespace GameEngine
 
         public Vector3 camChasePosition { get; set; }
 
+        public BoundingFrustum cameraFrustrum { get; set; }
 
         public void SetChaseCameraPosition(Vector3 position)
         {
