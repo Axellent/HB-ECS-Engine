@@ -12,10 +12,8 @@ namespace GameEngine {
         BoundingBoxToWorldSpace boxConvert;
         bool renderBoxInitialised = false;
 
-        public void Render(GraphicsDevice graphicsDevice, GameTime gameTime)
-        {
-            if (renderBoxInitialised.Equals(false))
-            {
+        public void Render(GraphicsDevice graphicsDevice, GameTime gameTime) {
+            if (renderBoxInitialised.Equals(false)) {
                 boxConvert = new BoundingBoxToWorldSpace();
                 boxRenderer = new DebugRenderBoundingBox(graphicsDevice);
                 renderBoxInitialised = true;
@@ -27,10 +25,8 @@ namespace GameEngine {
             TerrainMapComponent terrainComponent = ComponentManager.Instance.GetEntityComponent<TerrainMapComponent>(e);
             TransformComponent transformComponent = ComponentManager.Instance.GetEntityComponent<TransformComponent>(e);
 
-            if (terrainComponent != null)
-            {
-                if (transformComponent != null)
-                {
+            if (terrainComponent != null) {
+                if (transformComponent != null) {
                     /*RasterizerState r = new RasterizerState();
                     r.CullMode = CullMode.None;
                     //r.FillMode = FillMode.WireFrame;
@@ -38,8 +34,7 @@ namespace GameEngine {
 
                     terrainComponent.numChunksInView = 0;
 
-                    for (int i = 0; i < terrainComponent.terrainChunks.Count; ++i)
-                    {
+                    for (int i = 0; i < terrainComponent.terrainChunks.Count; ++i) {
                         terrainComponent.terrainChunks[i].effect.TextureEnabled = true;
                         terrainComponent.terrainChunks[i].effect.VertexColorEnabled = false;
                         terrainComponent.terrainChunks[i].effect.Texture = terrainComponent.terrainChunks[i].terrainTex;
@@ -50,10 +45,8 @@ namespace GameEngine {
 
                         BoundingBox box = boxConvert.ConvertBoundingBoxToWorldCoords(terrainComponent.terrainChunks[i].boundingBox, terrainComponent.terrainChunks[i].effect.World);
 
-                        if (box.Intersects(camera.cameraFrustrum))
-                        {
-                            foreach (EffectPass p in terrainComponent.terrainChunks[i].effect.CurrentTechnique.Passes)
-                            {
+                        if (box.Intersects(camera.cameraFrustrum)) {
+                            foreach (EffectPass p in terrainComponent.terrainChunks[i].effect.CurrentTechnique.Passes) {
                                 p.Apply();
                                 graphicsDevice.Indices = terrainComponent.terrainChunks[i].iBuffer;
                                 graphicsDevice.SetVertexBuffer(terrainComponent.terrainChunks[i].vBuffer);
@@ -95,7 +88,7 @@ namespace GameEngine {
 
         private static void InitIndices(ref TerrainMapComponent terrain) {
             terrain.indices = new int[(terrain.hmWidth - 1) * (terrain.hmHeight - 1) * 6];
-            int indicesCount = 0; ;
+            int indicesCount = 0;
 
             for (int y = 0; y < terrain.hmHeight - 1; ++y) {
                 for (int x = 0; x < terrain.hmWidth - 1; ++x) {
@@ -117,6 +110,7 @@ namespace GameEngine {
 
         private static void InitNormals(ref TerrainMapComponent terrain) {
             int indicesLen = terrain.indices.Length / 3;
+
             for (int i = 0; i < terrain.vertices.Length; ++i) {
                 terrain.vertices[i].Normal = new Vector3(0f, 0f, 0f);
             }
@@ -158,6 +152,7 @@ namespace GameEngine {
         private static void SetupTerrainChunks(ref TerrainMapComponent terrain, GraphicsDevice graphicsDevice, Texture2D defaultTexture) {
             //loop through all the chunks to cut out from the heightmap
             for (terrain.clipX = 0; terrain.clipX < terrain.hmWidth - 1; terrain.clipX += terrain.clipW) {
+
                 for (terrain.clipY = 0; terrain.clipY < terrain.hmHeight - 1; terrain.clipY += terrain.clipH) {
                     //use this line to see the chunks (don't use in real game)
                     //TerrainChunk t = new TerrainChunk(graphicsDevice, terrainHeightMap, new Rectangle(clipX, clipY, clipW, clipH ),

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 
 namespace GameEngine {
     public class TerrainChunk {
@@ -32,6 +33,7 @@ namespace GameEngine {
             CreateHightmap(terrainMap);
 
             vertices = InitTerrainVertices();
+            boundingBox = CreateBoundingBox(vertices);
 
             effect.FogEnabled = true;
             effect.FogStart = 10f;
@@ -144,5 +146,15 @@ namespace GameEngine {
             this.terrainTex = texture;
         }
 
+        private BoundingBox CreateBoundingBox(VertexPositionNormalTexture[] vertexArray){
+             List<Vector3> points = new List<Vector3>();
+
+             foreach (VertexPositionNormalTexture v in vertexArray){
+                 points.Add(v.Position);
+             }
+
+             BoundingBox b = BoundingBox.CreateFromPoints(points);
+             return b;
+         }
     }
 }

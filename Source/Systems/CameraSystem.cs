@@ -21,7 +21,7 @@ namespace GameEngine {
             //update the bounding frustum
             c.cameraFrustrum = new BoundingFrustum(c.viewMatrix * c.projectionMatrix);
 
-            if (c.targetEntity!=null){
+            if (c.targetEntity != null){
                 List<Entity> elist = ComponentManager.Instance.GetAllEntitiesWithComponentType<ModelComponent>();
                 Entity e = ComponentManager.Instance.GetEntityWithTag(c.targetEntity, elist);
 
@@ -45,7 +45,7 @@ namespace GameEngine {
                 c.viewMatrix = Matrix.CreateLookAt(pos, t.position, cameraUp);
 
                 //update the projection
-                // c.projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, c.aspectRatio, c.nearClipPlane, c.farClipPlane);
+                //c.projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, c.aspectRatio, c.nearClipPlane, c.farClipPlane);
             }
             //Else, a static camera that looks at origo is set up.
             else {
