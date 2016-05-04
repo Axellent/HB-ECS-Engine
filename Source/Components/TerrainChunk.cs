@@ -8,20 +8,16 @@ namespace GameEngine {
         public IndexBuffer iBuffer { get; set; }
         public BasicEffect effect { get; set; }
         public BoundingBox boundingBox { get; set; }
-
         public Vector3 offsetPosition { get; set; }
         public int indicesLenDiv3;
-
         public int width { get; set; }
         public int height { get; set; }
-
         public float[,] heightInfo;
-        public Texture2D terrainTex { get; set; }
-
         public VertexPositionNormalTexture[] vertices { get; set; }
         public int[] indices { get; set; }
-
         private Rectangle terrainRect;
+
+        public Texture2D terrainTex { get; set; }
 
         public TerrainChunk(GraphicsDevice graphicsDevice, Texture2D terrainMap, Rectangle terrainRect, Vector3 offsetPosition, VertexPositionNormalTexture[] vertexNormals) {
             effect = new BasicEffect(graphicsDevice);
@@ -155,6 +151,15 @@ namespace GameEngine {
 
              BoundingBox b = BoundingBox.CreateFromPoints(points);
              return b;
-         }
+        }
+
+        public void ToggleFog(bool useFog) {
+            effect.FogEnabled = useFog;
+        }
+
+        public void SetFog(float start, float end) {
+            effect.FogStart = start;
+            effect.FogEnd = end;
+        }
     }
 }

@@ -92,6 +92,7 @@ namespace GameEngine
                 }
             }
         }
+
         private void RenderBasicEffectModel(ModelComponent modelComp, TransformComponent t, CameraComponent c) {
             /*
             Matrix worldMatrix = Matrix.CreateScale(t.scale)    //Scale
@@ -105,9 +106,15 @@ namespace GameEngine
             foreach (ModelMesh mesh in modelComp.model.Meshes) {
                 foreach (BasicEffect effect in mesh.Effects) {
                     effect.EnableDefaultLighting();
-                    if (modelComp.textured == true) {
+                    if (modelComp.textured) {
                         effect.TextureEnabled = true;
                         effect.Texture = modelComp.texture;
+                    }
+                    if (modelComp.useFog) {
+                        effect.FogEnabled = true;
+                        effect.FogColor = Color.LightGray.ToVector3();
+                        effect.FogStart = modelComp.fogStart;
+                        effect.FogEnd = modelComp.fogEnd;
                     }
 
                     effect.World = transforms[mesh.ParentBone.Index] * t.world;
