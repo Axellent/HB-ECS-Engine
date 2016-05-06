@@ -3,7 +3,7 @@
 namespace GameEngine {
     public class CameraComponent : IComponent {
         public float nearClipPlane = 1f;
-        public float farClipPlane = 500f;
+        public float farClipPlane = 1000f;
         public Matrix projectionMatrix;
         public Matrix viewMatrix;
 

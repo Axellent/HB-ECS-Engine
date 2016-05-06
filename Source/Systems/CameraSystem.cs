@@ -33,6 +33,8 @@ namespace GameEngine {
                 //move the camera to the object position
                 pos += t.position;
 
+                c.position = pos;
+
                 //update the camera up position
                 Vector3 cameraUp = new Vector3(0, 1, 0);
                 cameraUp = Vector3.Transform(cameraUp, Matrix.CreateFromQuaternion(t.rotation));

@@ -92,7 +92,6 @@
     <Compile Include="Source\Systems\AnimateSystem.cs" />
     <Compile Include="Source\Systems\CameraSystem.cs" />
     <Compile Include="Source\Systems\CollisionSystem.cs" />
-    <Compile Include="Source\Systems\EnvironmentMappingSystem.cs" />
     <Compile Include="Source\Systems\GamePadSystem.cs" />
     <Compile Include="Source\Systems\InputSystem.cs" />
     <Compile Include="Source\Systems\IRender3DSystem.cs" />
