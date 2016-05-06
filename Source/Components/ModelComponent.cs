@@ -7,7 +7,10 @@ namespace GameEngine {
         public Model model { get; set; }
         public bool textured { get; set; }
         public Texture2D texture { get; set; }
+        public Effect effect { get; set; }
         public bool useBasicEffect { get; set; }
+        public TextureCube environmentMap { get; set; }
+        public bool useEnvironmentalMapping { get; set; }
         public bool useFog { get; set; }
         public float fogStart { get; private set; }
         public float fogEnd { get; private set; }

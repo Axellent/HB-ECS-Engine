@@ -1,21 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using GameEngine;
 
-namespace GameEngine
-{
-    public class ModelRenderSystem : IRender3DSystem
-    {
+namespace GameEngine {
+    public class ModelRenderSystem : IRender3DSystem {
         DebugRenderBoundingBox boxRenderer;
         BoundingBoxToWorldSpace boxConvert;
         bool renderBoxInitialised = false;
 
-        private bool modelInCameraFrustrum=false;
+        private bool modelInCameraFrustrum = false;
 
         public void Render(GraphicsDevice graphicsDevice, GameTime gameTime) {
             if (renderBoxInitialised.Equals(false)) {
@@ -25,67 +19,79 @@ namespace GameEngine
             }
 
             List<List<Entity>> sceneEntities = SceneManager.Instance.GetActiveScene().GetAllLayers();
-            Entity Ecamera = ComponentManager.Instance.GetFirstEntityOfType<CameraComponent>();
-            CameraComponent c = ComponentManager.Instance.GetEntityComponent<CameraComponent>(Ecamera);
+            Entity camEnt = ComponentManager.Instance.GetFirstEntityOfType<CameraComponent>();
+            CameraComponent c = ComponentManager.Instance.GetEntityComponent<CameraComponent>(camEnt);
             Entity modelCount = ComponentManager.Instance.GetFirstEntityOfType<ModelCountComponent>();
             ModelCountComponent modelsInView = ComponentManager.Instance.GetEntityComponent<ModelCountComponent>(modelCount);
 
             if (sceneEntities == null || c == null) {
                 return;
             }
-            if (modelsInView != null)
+
+            if (modelsInView != null) {
                 modelsInView.numModelsInView = 0;
+            }
 
             for (int i = 0; i < sceneEntities.Count; ++i) {
                 foreach (Entity entity in sceneEntities[i]) {
-                    if (entity.Visible) {
-                        ModelComponent m = ComponentManager.Instance.GetEntityComponent<ModelComponent>(entity);
-                        ModelBoundingBoxComponent b = ComponentManager.Instance.GetEntityComponent<ModelBoundingBoxComponent>(entity);
+                    RenderEntity(entity, c, modelsInView);
+                }
+            }
+        }
 
-                        //if the entity has a model component
-                        if (m != null) {
-                            //loop through all mesh transforms in the model
-                            foreach (var pair in m.meshTransforms) {
-                                //update the model transforms
-                                ChangeBoneTransform(m, pair.Key, pair.Value);
+        private void RenderEntity(Entity entity, CameraComponent c, ModelCountComponent modelsInView) {
+            if (entity.Visible) {
+                ModelComponent m = ComponentManager.Instance.GetEntityComponent<ModelComponent>(entity);
+                ModelBoundingBoxComponent b = ComponentManager.Instance.GetEntityComponent<ModelBoundingBoxComponent>(entity);
+
+                //if the entity has a model component
+                if (m != null) {
+                    //loop through all mesh transforms in the model
+                    foreach (var pair in m.meshTransforms) {
+                        //update the model transforms
+                        ChangeBoneTransform(m, pair.Key, pair.Value);
+                    }
+
+                    TransformComponent t = ComponentManager.Instance.GetEntityComponent<TransformComponent>(entity);
+                    //if there is a transform component
+                    if (t != null) {
+                        //if the model has bounding boxes
+                        if (b != null) {
+                            modelInCameraFrustrum = false;
+                            foreach (BoundingBox bb in b.boundingBoxes) {
+                                Vector3 leftRightVector = Matrix.Transpose(c.viewMatrix).Right;
+                                boxRenderer.RenderBoundingBox(bb, t.world, c.viewMatrix, c.projectionMatrix);
+                                BoundingBox box = boxConvert.ConvertBoundingBoxToWorldCoords(b.boundingBoxes[0], Matrix.CreateTranslation(t.position));
+                                BoundingSphere s = BoundingSphere.CreateFromBoundingBox(box);
+
+                                if (c.cameraFrustrum.Contains(s) != ContainmentType.Disjoint) {
+                                    modelInCameraFrustrum = true;
+                                    break;
+                                }
                             }
+                            if (modelInCameraFrustrum == true) {
+                                if (modelsInView != null)
+                                    modelsInView.numModelsInView++;
 
-                            TransformComponent t = ComponentManager.Instance.GetEntityComponent<TransformComponent>(entity);
-                            //if there is a transform component
-                            if (t != null) {
-                                //if the model has bounding boxes
-                                if (b != null) {
-                                    modelInCameraFrustrum = false;
-                                    foreach (BoundingBox bb in b.boundingBoxes) {
-                                        Vector3 leftRightVector = Matrix.Transpose(c.viewMatrix).Right;
-                                        boxRenderer.RenderBoundingBox(bb, t.world, c.viewMatrix, c.projectionMatrix);
-                                        BoundingBox box = boxConvert.ConvertBoundingBoxToWorldCoords(b.boundingBoxes[0], Matrix.CreateTranslation(t.position));
-                                        BoundingSphere s = BoundingSphere.CreateFromBoundingBox(box);
-
-                                        if (c.cameraFrustrum.Contains(s) != ContainmentType.Disjoint) {
-                                            modelInCameraFrustrum = true;
-                                            break;
-                                        }
-                                    }
-                                    if (modelInCameraFrustrum == true) {
-                                        if (modelsInView != null)
-                                            modelsInView.numModelsInView++;
-
-                                        //If the model uses monogames built-in basic effects
-                                        if (m.useBasicEffect) {
-                                            //render the model with basic effects
-                                            RenderBasicEffectModel(m, t, c);
-                                        }
-                                    }
+                                //If the model uses monogames built-in basic effects
+                                if (m.useBasicEffect) {
+                                    //render the model with basic effects
+                                    RenderBasicEffectModel(m, t, c);
                                 }
-                                //if the model doesn't have any bounding boxes
-                                else {
-                                    //If the model uses monogames built-in basic effects
-                                    if (m.useBasicEffect) {
-                                        //render the model with basic effects
-                                        RenderBasicEffectModel(m, t, c);
-                                    }
+                                if (m.useEnvironmentalMapping) {
+                                    RenderEnvironmentalMappingEffect(m, t, c);
                                 }
+                            }
+                        }
+                        //if the model doesn't have any bounding boxes
+                        else {
+                            //If the model uses monogames built-in basic effects
+                            if (m.useBasicEffect) {
+                                //render the model with basic effects
+                                RenderBasicEffectModel(m, t, c);
+                            }
+                            if (m.useEnvironmentalMapping) {
+                                RenderEnvironmentalMappingEffect(m, t, c);
                             }
                         }
                     }
@@ -126,13 +132,27 @@ namespace GameEngine
             }
         }
 
+        private void RenderEnvironmentalMappingEffect(ModelComponent modelComp, TransformComponent t, CameraComponent c) {
+            foreach (ModelMesh mesh in modelComp.model.Meshes) {
+                foreach (ModelMeshPart part in mesh.MeshParts) {
+                    part.Effect = modelComp.effect;
+                    part.Effect.Parameters["World"].SetValue(t.world * mesh.ParentBone.Transform * Matrix.CreateScale(new Vector3(20f)));
+                    part.Effect.Parameters["View"].SetValue(c.viewMatrix);
+                    part.Effect.Parameters["Projection"].SetValue(c.projectionMatrix);
+                    part.Effect.Parameters["SkyboxTexture"].SetValue(modelComp.environmentMap);
+                    part.Effect.Parameters["CameraPosition"].SetValue(c.position);
+                    part.Effect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(t.world * mesh.ParentBone.Transform)));
+                }
+                mesh.Draw();
+            }
+        }
+
         /// <summary>
         /// This function rotates the given bone by the given matrix
         /// </summary>
         /// <param name="boneIndex"></param>
         /// <param name="t"></param>
-        private void ChangeBoneTransform(ModelComponent modelComp,int boneIndex, Matrix t)
-        {
+        private void ChangeBoneTransform(ModelComponent modelComp, int boneIndex, Matrix t) {
             modelComp.model.Bones[boneIndex].Transform = t * modelComp.model.Bones[boneIndex].Transform;
         }
 
