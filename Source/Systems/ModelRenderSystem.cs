@@ -78,9 +78,6 @@ namespace GameEngine {
                                     //render the model with basic effects
                                     RenderBasicEffectModel(m, t, c);
                                 }
-                                if (m.useEnvironmentalMapping) {
-                                    RenderEnvironmentalMappingEffect(m, t, c);
-                                }
                             }
                         }
                         //if the model doesn't have any bounding boxes
@@ -89,9 +86,6 @@ namespace GameEngine {
                             if (m.useBasicEffect) {
                                 //render the model with basic effects
                                 RenderBasicEffectModel(m, t, c);
-                            }
-                            if (m.useEnvironmentalMapping) {
-                                RenderEnvironmentalMappingEffect(m, t, c);
                             }
                         }
                     }
@@ -133,18 +127,7 @@ namespace GameEngine {
         }
 
         private void RenderEnvironmentalMappingEffect(ModelComponent modelComp, TransformComponent t, CameraComponent c) {
-            foreach (ModelMesh mesh in modelComp.model.Meshes) {
-                foreach (ModelMeshPart part in mesh.MeshParts) {
-                    part.Effect = modelComp.effect;
-                    part.Effect.Parameters["World"].SetValue(t.world * mesh.ParentBone.Transform * Matrix.CreateScale(new Vector3(20f)));
-                    part.Effect.Parameters["View"].SetValue(c.viewMatrix);
-                    part.Effect.Parameters["Projection"].SetValue(c.projectionMatrix);
-                    part.Effect.Parameters["SkyboxTexture"].SetValue(modelComp.environmentMap);
-                    part.Effect.Parameters["CameraPosition"].SetValue(c.position);
-                    part.Effect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert(t.world * mesh.ParentBone.Transform)));
-                }
-                mesh.Draw();
-            }
+
         }
 
         /// <summary>
