@@ -126,10 +126,6 @@ namespace GameEngine {
             }
         }
 
-        private void RenderEnvironmentalMappingEffect(ModelComponent modelComp, TransformComponent t, CameraComponent c) {
-
-        }
-
         /// <summary>
         /// This function rotates the given bone by the given matrix
         /// </summary>
